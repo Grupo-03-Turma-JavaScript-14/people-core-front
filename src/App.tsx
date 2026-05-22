@@ -1,3 +1,4 @@
+
 import AppRoutes from "./Pages/AppRoutes";
 
 function App() {
@@ -5,3 +6,4 @@ function App() {
 }
 
 export default App;
+
