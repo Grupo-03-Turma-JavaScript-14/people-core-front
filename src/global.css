@@ -1,0 +1,104 @@
+:root {
+  /* ===================================================
+     BRAND COLORS
+  =================================================== */
+
+  --color-primary: #14B8A6;
+  --color-primary-dark: #0F766E;
+  --color-primary-light: #5EEAD4;
+
+  --color-accent: #FACC15;
+  --color-accent-dark: #EAB308;
+  --color-accent-light: #FEF3C7;
+
+  /* ===================================================
+     NEUTRAL COLORS
+  =================================================== */
+
+  --color-background: #F8FAFC;
+  --color-surface: #FFFFFF;
+
+  --color-dark: #0F172A;
+  --color-card: #1E293B;
+  --color-border: #334155;
+
+  --color-text: #0F172A;
+  --color-text-secondary: #94A3B8;
+  --color-text-light: #F8FAFC;
+
+  /* ===================================================
+     SEMANTIC COLORS
+  =================================================== */
+
+  --color-success: #22C55E;
+  --color-info: #3B82F6;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+
+  /* ===================================================
+     GRADIENTS
+  =================================================== */
+
+  --gradient-primary:
+    linear-gradient(135deg, #14B8A6 0%, #5EEAD4 100%);
+
+  --gradient-accent:
+    linear-gradient(135deg, #FACC15 0%, #FDE68A 100%);
+
+  --gradient-dark:
+    linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+
+  --gradient-background:
+    linear-gradient(180deg, #F8FAFC 0%, #EEF2F7 100%);
+
+  /* ===================================================
+     SHADOWS
+  =================================================== */
+
+  --shadow-sm:
+    0 2px 8px rgba(15, 23, 42, 0.05);
+
+  --shadow-md:
+    0 8px 24px rgba(15, 23, 42, 0.10);
+
+  --shadow-lg:
+    0 16px 40px rgba(15, 23, 42, 0.15);
+
+  --shadow-primary:
+    0 10px 30px rgba(20, 184, 166, 0.25);
+
+  /* ===================================================
+     GLASS EFFECT
+  =================================================== */
+
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.25);
+  --glass-blur: blur(16px);
+
+  /* ===================================================
+     BORDER RADIUS
+  =================================================== */
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 999px;
+
+  /* ===================================================
+     TRANSITIONS
+  =================================================== */
+
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* ===================================================
+     LAYOUT
+  =================================================== */
+
+  --navbar-height: 80px;
+  --footer-height: 80px;
+
+  --container-width: 1280px;
+}
