@@ -26,7 +26,7 @@ export default function Funcionarios() {
   
   function handleDelete(id: number) {
     setFuncionarios((prev) =>
-      prev.filter((funcionario) => f.id !== id)
+      prev.filter((funcionario) => funcionario.id !== id)
     )
   }
 
