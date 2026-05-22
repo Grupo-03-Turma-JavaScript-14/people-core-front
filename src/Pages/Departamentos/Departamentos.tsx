@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pencil, Trash2, Plus, X, ChevronDown, Loader2 } from "lucide-react";
+import "../../Style/Css/Pages/Departamentos.css"
 
 import {
   listarDepartamentos,
   cadastrarDepartamento,
   atualizarDepartamento,
   deletarDepartamento,
-} from "../../service/Service.ts";
+} from "../../service/Service";
 import { listarFuncionarios } from "../../service/Service";
-import type { Departamento, Funcionario } from "../../service/Types.ts";
+import type { Departamento, Funcionario } from "../../service/Types";
 
 // ============================================================
 // PÁGINA PRINCIPAL
@@ -76,7 +77,6 @@ function DepartamentosPage() {
 
   // ── Deletar departamento ─────────────────────────────────
   async function handleDeletar(id: number) {
-    if (!confirm("Tem certeza que deseja deletar este departamento?")) return;
     try {
       await deletarDepartamento(id);
       setDepartamentos((prev) => prev.filter((d) => d.id !== id));
@@ -139,28 +139,34 @@ function DepartamentosPage() {
       )}
 
       {/* LISTA DE CARDS */}
-      {!loading && !erro && (
-        <>
-          {departamentos.length === 0 ? (
-            <div className="feedback-state">
-              <span>Nenhum departamento cadastrado.</span>
-            </div>
-          ) : (
-            departamentos.map((dept, index) => (
-              <DepartamentoCard
-                key={dept.id}
-                departamento={dept}
-                index={index}
-                onVerFuncionarios={() => abrirFuncionarios(dept)}
-                onEditar={() =>
-                  setModalForm({ aberto: true, modo: "editar", departamento: dept })
-                }
-                onDeletar={() => dept.id && handleDeletar(dept.id)}
-              />
-            ))
-          )}
-        </>
-      )}
+{!loading && !erro && (
+  <>
+    {departamentos.length === 0 ? (
+      <div className="feedback-state">
+        <span>Nenhum departamento cadastrado.</span>
+      </div>
+    ) : (
+      <div className="departments-list">
+        {departamentos.map((dept, index) => (
+          <DepartamentoCard
+            key={dept.id}
+            departamento={dept}
+            index={index}
+            onVerFuncionarios={() => abrirFuncionarios(dept)}
+            onEditar={() =>
+              setModalForm({
+                aberto: true,
+                modo: "editar",
+                departamento: dept,
+              })
+            }
+            onDeletar={() => dept.id && handleDeletar(dept.id)}
+          />
+        ))}
+      </div>
+    )}
+  </>
+)}
 
       {/* MODAL: FUNCIONÁRIOS */}
       <AnimatePresence>
@@ -309,9 +315,16 @@ function ModalFuncionarios({
       >
         <div className="modal-header">
           <h2>Funcionários — {nome}</h2>
-          <button className="close-modal" onClick={onClose}>
-            <X size={18} />
-          </button>
+          <div className="modal-header-actions">
+            <TooltipButton
+              icon={<Plus size={18} />}
+              label="Adicionar funcionário"
+              onClick={() => console.log("novo funcionário")}
+            />
+            <button className="close-modal" onClick={onClose}>
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         <div className="modal-body">
@@ -330,6 +343,18 @@ function ModalFuncionarios({
                 <div className="employee-info">
                   <strong>{f.nome}</strong>
                   <span>{f.cargo}</span>
+                </div>
+                <div className="employee-actions">
+                  <TooltipButton
+                    label="Editar"
+                    icon={<Pencil size={16} />}
+                    onClick={() => console.log("editar", f.id)}
+                  />
+                  <TooltipButton
+                    label="Excluir"
+                    icon={<Trash2 size={16} />}
+                    onClick={() => console.log("excluir", f.id)}
+                  />
                 </div>
               </div>
             ))
