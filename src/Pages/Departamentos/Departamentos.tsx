@@ -1,18 +1,109 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import "../../Style/Css/Pages/Departamentos.css";
-import {Pencil, Trash2, Plus, X, ChevronDown} from "lucide-react";
+import { Pencil, Trash2, Plus, X, ChevronDown, Loader2 } from "lucide-react";
 
-function Departamento() {
-  const [expanded, setExpanded] = useState(false);
-  const [showFuncionarios, setShowFuncionarios] = useState(false);
+import {
+  listarDepartamentos,
+  cadastrarDepartamento,
+  atualizarDepartamento,
+  deletarDepartamento,
+} from "../../service/Service.ts";
+import { listarFuncionarios } from "../../service/Service";
+import type { Departamento, Funcionario } from "../../service/Types.ts";
 
-  const funcionarios = [
-    { id: 1, nome: "João Silva", cargo: "Dev" },
-    { id: 2, nome: "Maria Souza", cargo: "QA" },
-    { id: 3, nome: "Carlos Lima", cargo: "DevOps" }
-  ];
+// ============================================================
+// PÁGINA PRINCIPAL
+// ============================================================
 
+function DepartamentosPage() {
+  const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState<string | null>(null);
+
+  // Modal de funcionários
+  const [modalFuncionarios, setModalFuncionarios] = useState<{
+    aberto: boolean;
+    departamentoId?: number;
+    departamentoNome?: string;
+  }>({ aberto: false });
+  const [funcionariosDept, setFuncionariosDept] = useState<Funcionario[]>([]);
+  const [loadingFuncs, setLoadingFuncs] = useState(false);
+
+  // Modal de criar/editar departamento
+  const [modalForm, setModalForm] = useState<{
+    aberto: boolean;
+    modo: "criar" | "editar";
+    departamento?: Departamento;
+  }>({ aberto: false, modo: "criar" });
+
+  // ── Carregamento inicial ──────────────────────────────────
+  useEffect(() => {
+    carregarDepartamentos();
+  }, []);
+
+  async function carregarDepartamentos() {
+    setLoading(true);
+    setErro(null);
+    try {
+      const dados = await listarDepartamentos();
+      setDepartamentos(dados);
+    } catch {
+      setErro("Não foi possível carregar os departamentos.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ── Ver funcionários de um departamento ──────────────────
+  async function abrirFuncionarios(dept: Departamento) {
+    setModalFuncionarios({
+      aberto: true,
+      departamentoId: dept.id,
+      departamentoNome: dept.departamento,
+    });
+    setLoadingFuncs(true);
+    try {
+      // Filtra funcionários pelo departamento via campo categoria
+      const todos = await listarFuncionarios();
+      const filtrados = todos.filter((f) => f.categoria?.id === dept.id);
+      setFuncionariosDept(filtrados);
+    } catch {
+      setFuncionariosDept([]);
+    } finally {
+      setLoadingFuncs(false);
+    }
+  }
+
+  // ── Deletar departamento ─────────────────────────────────
+  async function handleDeletar(id: number) {
+    if (!confirm("Tem certeza que deseja deletar este departamento?")) return;
+    try {
+      await deletarDepartamento(id);
+      setDepartamentos((prev) => prev.filter((d) => d.id !== id));
+    } catch {
+      alert("Erro ao deletar departamento.");
+    }
+  }
+
+  // ── Salvar (criar ou editar) ─────────────────────────────
+  async function handleSalvar(dados: Departamento) {
+    try {
+      if (modalForm.modo === "criar") {
+        const novo = await cadastrarDepartamento(dados);
+        setDepartamentos((prev) => [...prev, novo]);
+      } else {
+        const atualizado = await atualizarDepartamento(dados);
+        setDepartamentos((prev) =>
+          prev.map((d) => (d.id === atualizado.id ? atualizado : d))
+        );
+      }
+      setModalForm({ aberto: false, modo: "criar" });
+    } catch {
+      alert("Erro ao salvar departamento.");
+    }
+  }
+
+  // ── Render ───────────────────────────────────────────────
   return (
     <div className="page-container">
 
@@ -22,140 +113,325 @@ function Departamento() {
           <h1>Departamentos</h1>
           <p>Gerencie as unidades e divisões da PeopleCore</p>
         </div>
-
-        <button className="btn-primary">
+        <button
+          className="btn-primary"
+          onClick={() => setModalForm({ aberto: true, modo: "criar" })}
+        >
           + Novo Departamento
         </button>
       </header>
 
-      {/* CARD */}
-      <div className={`dept-card ${expanded ? "expanded" : ""}`}>
-
-        <div
-          className="dept-card-header"
-          onClick={() => setExpanded((prev) => !prev)}
-        >
-          <div className="header-main">
-            <span className="dept-badge">#01</span>
-            <h3 className="dept-title">Desenvolvimento</h3>
-          </div>
-
-          <button
-                className="btn-expand"
-                type="button"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    setExpanded((prev) => !prev);
-                }}
-                >
-                <ChevronDown size={18} />
-            </button>
-        </div>
-
-        <div className="dept-card-expandable">
-          <div className="expand-content-inner">
-
-            <div className="description-section">
-              <label>Sobre o Departamento</label>
-              <p>
-                Responsável pela manutenção da plataforma PeopleCore e inovação tecnológica.
-              </p>
-            </div>
-
-            <div className="stats-section">
-              <div className="stat-item">
-                <span className="stat-value">12</span>
-                <span className="stat-label">Funcionários</span>
-
-                <button
-                  className="funcionarios-dept"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowFuncionarios(true);
-                  }}
-                >
-                  Ver funcionários
-                </button>
-              </div>
-            </div>
-
-            <div className="crud-actions">
-              <button className="btn-action edit">Editar</button>
-              <button className="btn-action delete">Deletar</button>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      {/* =========================
-          MODAL FUNCIONÁRIOS
-      ========================= */}
-
-      {showFuncionarios && (
-        <div
-          className="modal-overlay"
-          onClick={() => setShowFuncionarios(false)}
-        >
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-header">
-              <h2>Funcionários</h2>
-              <div className="modal-header-actions">
-                 <TooltipButton
-                  icon={<Plus size={18} />}
-                  label="Adicionar funcionário"
-                  onClick={() => console.log("novo")}
-                />
-                        <button
-                            className="close-modal"
-                    onClick={() => setShowFuncionarios(false)}
-                    ><X size={18} /></button>
-            </div>
-            </div>
-
-            <div className="modal-body">
-              {funcionarios.map((f) => (
-                <div key={f.id} className="employee-item">
-
-                  <div className="employee-info">
-                    <strong>{f.nome}</strong>
-                    <span>{f.cargo}</span>
-                  </div>
-
-                  <div className="employee-actions">
-
-                    <TooltipButton
-                      label="Editar"
-                      icon={<Pencil size={16} />}
-                      onClick={() => console.log("editar", f.id)}
-                    />
-
-                    <TooltipButton
-                      label="Excluir"
-                      icon={<Trash2 size={16} />}
-                      onClick={() => console.log("excluir", f.id)}
-                    />
-
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* ESTADOS DE CARREGAMENTO / ERRO */}
+      {loading && (
+        <div className="feedback-state">
+          <Loader2 size={24} className="spin" />
+          <span>Carregando departamentos...</span>
         </div>
       )}
 
+      {erro && (
+        <div className="feedback-state error">
+          <span>{erro}</span>
+          <button className="btn-primary" onClick={carregarDepartamentos}>
+            Tentar novamente
+          </button>
+        </div>
+      )}
+
+      {/* LISTA DE CARDS */}
+      {!loading && !erro && (
+        <>
+          {departamentos.length === 0 ? (
+            <div className="feedback-state">
+              <span>Nenhum departamento cadastrado.</span>
+            </div>
+          ) : (
+            departamentos.map((dept, index) => (
+              <DepartamentoCard
+                key={dept.id}
+                departamento={dept}
+                index={index}
+                onVerFuncionarios={() => abrirFuncionarios(dept)}
+                onEditar={() =>
+                  setModalForm({ aberto: true, modo: "editar", departamento: dept })
+                }
+                onDeletar={() => dept.id && handleDeletar(dept.id)}
+              />
+            ))
+          )}
+        </>
+      )}
+
+      {/* MODAL: FUNCIONÁRIOS */}
+      <AnimatePresence>
+        {modalFuncionarios.aberto && (
+          <ModalFuncionarios
+            nome={modalFuncionarios.departamentoNome ?? ""}
+            funcionarios={funcionariosDept}
+            loading={loadingFuncs}
+            onClose={() => setModalFuncionarios({ aberto: false })}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* MODAL: FORM DEPARTAMENTO */}
+      <AnimatePresence>
+        {modalForm.aberto && (
+          <ModalFormDepartamento
+            modo={modalForm.modo}
+            departamento={modalForm.departamento}
+            onSalvar={handleSalvar}
+            onClose={() => setModalForm({ aberto: false, modo: "criar" })}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
-/* =========================
-   BOTÃO COM TOOLTIP ANIMADO
-========================= */
+// ============================================================
+// CARD DE DEPARTAMENTO
+// ============================================================
 
-function TooltipButton({icon, label, onClick}: {
+interface CardProps {
+  departamento: Departamento;
+  index: number;
+  onVerFuncionarios: () => void;
+  onEditar: () => void;
+  onDeletar: () => void;
+}
+
+function DepartamentoCard({
+  departamento,
+  index,
+  onVerFuncionarios,
+  onEditar,
+  onDeletar,
+}: CardProps) {
+  const [expanded, setExpanded] = useState(false);
+  const totalFuncionarios = departamento.funcionarios?.length ?? 0;
+
+  return (
+    <div className={`dept-card ${expanded ? "expanded" : ""}`}>
+
+      <div
+        className="dept-card-header"
+        onClick={() => setExpanded((prev) => !prev)}
+      >
+        <div className="header-main">
+          <span className="dept-badge">#{String(index + 1).padStart(2, "0")}</span>
+          <h3 className="dept-title">{departamento.departamento}</h3>
+        </div>
+
+        <button
+          className="btn-expand"
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setExpanded((prev) => !prev);
+          }}
+        >
+          <ChevronDown size={18} />
+        </button>
+      </div>
+
+      <div className="dept-card-expandable">
+        <div className="expand-content-inner">
+
+          <div className="stats-section">
+            <div className="stat-item">
+              <span className="stat-value">{totalFuncionarios}</span>
+              <span className="stat-label">Funcionários</span>
+
+              <button
+                className="funcionarios-dept"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onVerFuncionarios();
+                }}
+              >
+                Ver funcionários
+              </button>
+            </div>
+          </div>
+
+          <div className="crud-actions">
+            <button
+              className="btn-action edit"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditar();
+              }}
+            >
+              <Pencil size={15} /> Editar
+            </button>
+            <button
+              className="btn-action delete"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeletar();
+              }}
+            >
+              <Trash2 size={15} /> Deletar
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// MODAL: LISTA DE FUNCIONÁRIOS
+// ============================================================
+
+function ModalFuncionarios({
+  nome,
+  funcionarios,
+  loading,
+  onClose,
+}: {
+  nome: string;
+  funcionarios: Funcionario[];
+  loading: boolean;
+  onClose: () => void;
+}) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <motion.div
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.95, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 16 }}
+        transition={{ duration: 0.2 }}
+      >
+        <div className="modal-header">
+          <h2>Funcionários — {nome}</h2>
+          <button className="close-modal" onClick={onClose}>
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="modal-body">
+          {loading ? (
+            <div className="feedback-state">
+              <Loader2 size={20} className="spin" />
+              <span>Carregando...</span>
+            </div>
+          ) : funcionarios.length === 0 ? (
+            <div className="feedback-state">
+              <span>Nenhum funcionário neste departamento.</span>
+            </div>
+          ) : (
+            funcionarios.map((f) => (
+              <div key={f.id} className="employee-item">
+                <div className="employee-info">
+                  <strong>{f.nome}</strong>
+                  <span>{f.cargo}</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ============================================================
+// MODAL: FORMULÁRIO CRIAR / EDITAR DEPARTAMENTO
+// ============================================================
+
+function ModalFormDepartamento({
+  modo,
+  departamento,
+  onSalvar,
+  onClose,
+}: {
+  modo: "criar" | "editar";
+  departamento?: Departamento;
+  onSalvar: (dados: Departamento) => Promise<void>;
+  onClose: () => void;
+}) {
+  const [nome, setNome] = useState(departamento?.departamento ?? "");
+  const [salvando, setSalvando] = useState(false);
+
+  async function handleSubmit() {
+    if (!nome.trim()) {
+      alert("O nome do departamento é obrigatório.");
+      return;
+    }
+    setSalvando(true);
+    await onSalvar({ ...departamento, departamento: nome.trim() });
+    setSalvando(false);
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <motion.div
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.95, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 16 }}
+        transition={{ duration: 0.2 }}
+      >
+        <div className="modal-header">
+          <h2>{modo === "criar" ? "Novo Departamento" : "Editar Departamento"}</h2>
+          <button className="close-modal" onClick={onClose}>
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="modal-body">
+          <div className="form-group">
+            <label htmlFor="nome-dept">Nome do Departamento</label>
+            <input
+              id="nome-dept"
+              type="text"
+              className="form-input"
+              placeholder="Ex: Desenvolvimento"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+              autoFocus
+            />
+          </div>
+        </div>
+
+        <div className="modal-footer">
+          <button className="btn-action edit" onClick={onClose} disabled={salvando}>
+            Cancelar
+          </button>
+          <button className="btn-primary" onClick={handleSubmit} disabled={salvando}>
+            {salvando ? (
+              <>
+                <Loader2 size={15} className="spin" />
+                Salvando...
+              </>
+            ) : modo === "criar" ? (
+              "Criar"
+            ) : (
+              "Salvar"
+            )}
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ============================================================
+// TOOLTIP BUTTON (mantido do original)
+// ============================================================
+
+function TooltipButton({
+  icon,
+  label,
+  onClick,
+}: {
   icon: React.ReactNode;
   label: string;
   onClick?: () => void;
@@ -189,4 +465,4 @@ function TooltipButton({icon, label, onClick}: {
   );
 }
 
-export default Departamento;
+export default DepartamentosPage;
