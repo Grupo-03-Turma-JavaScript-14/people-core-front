@@ -1,12 +1,7 @@
-import './App.css'
+import Perfil from "./Pages/Perfil/Perfil";
 
 function App() {
-
-  return (
-    <>
-      
-    </>
-  )
+  return <Perfil />;
 }
 
-export default App
+export default App;
