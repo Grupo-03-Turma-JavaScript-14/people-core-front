@@ -1,0 +1,153 @@
+.home {
+  min-height: 100vh;
+  background-color: var(--color-background, #f8f5ef);
+  padding: 4rem 6%;
+}
+
+.home__hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4rem;
+}
+
+.home__content {
+  max-width: 560px;
+}
+
+.home__tag {
+  display: inline-block;
+  background-color: #d8eee7;
+  color: #0f4c5c;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.home__content h1 {
+  margin-top: 1.5rem;
+  font-size: 3.8rem;
+  line-height: 1.1;
+  color: #12343b;
+}
+
+.home__content p {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #4f4f4f;
+}
+
+.home__actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.home__button {
+  border: none;
+  background-color: #0f4c5c;
+  color: white;
+  padding: 1rem 1.4rem;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.home__button--outline {
+  background-color: transparent;
+  color: #0f4c5c;
+  border: 2px solid #0f4c5c;
+}
+
+.home__visual {
+  flex: 1;
+  min-height: 420px;
+  border-radius: 32px;
+  background: linear-gradient(135deg, #f3ead8, #d8eee7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home__panel {
+  width: 70%;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+.home__panel h2 {
+  color: #0f4c5c;
+  margin-bottom: 1rem;
+}
+
+.home__panel p {
+  color: #4f4f4f;
+  line-height: 1.6;
+}
+.home__panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 2rem;
+}
+
+.home__panel-badge {
+  background-color: #d8eee7;
+  color: #0f4c5c;
+
+  padding: 0.4rem 0.8rem;
+
+  border-radius: 999px;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.home__metrics {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 1rem;
+
+  margin-bottom: 2rem;
+}
+
+.home__metric-card {
+  background-color: #f8f5ef;
+
+  padding: 1rem;
+
+  border-radius: 16px;
+
+  transition: 0.3s;
+}
+
+.home__metric-card:hover {
+  transform: translateY(-4px);
+}
+
+.home__metric-card strong {
+  font-size: 1.8rem;
+
+  color: #0f4c5c;
+}
+
+.home__metric-card p {
+  margin-top: 0.5rem;
+
+  color: #4f4f4f;
+
+  font-size: 0.9rem;
+}
+
+.home__panel-footer p {
+  color: #4f4f4f;
+
+  line-height: 1.6;
+}
