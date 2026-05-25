@@ -101,16 +101,10 @@ function Login() {
         {/* Coluna de marca */}
         <div className="login-brand">
           <img
-            src="/peoplecore.png"
+            src="/peoplecore-logo.png"
             alt="PeopleCore"
             className="login-brand__logo"
           />
-          <p className="login-brand__subtitle">
-            Gestão de pessoas que gera resultados.
-          </p>
-          <p className="login-brand__description">
-            Acesse sua conta e continue acompanhando o crescimento da sua equipe.
-          </p>
         </div>
 
         {/* Coluna do formulário */}
