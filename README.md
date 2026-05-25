@@ -31,11 +31,13 @@ A aplicação foi projetada com foco em:
 
 <p align="center">
   <img 
-    src="https://github.com/user-attachments/assets/e3f509c8-11d2-4688-b996-0849501bf3eb"
+    src="https://github.com/user-attachments/assets/0fc9705c-62a0-4163-b920-f908cc2fe694"
     alt="Preview Dashboard PeopleCore"
     width="100%"
   />
 </p>
+
+---
 
 ---
 
