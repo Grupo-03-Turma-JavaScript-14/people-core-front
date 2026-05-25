@@ -105,16 +105,10 @@ function Register() {
         {/* Coluna de marca */}
         <div className="register-brand">
           <img
-            src="/peoplecore.png"
+            src="/peoplecore-logo.png"
             alt="PeopleCore"
             className="register-brand__logo-image"
           />
-          <p className="register-brand__subtitle">
-            Gestão de pessoas que gera resultados.
-          </p>
-          <p className="register-brand__description">
-            Crie sua conta e faça parte da plataforma que une energia, leveza e crescimento.
-          </p>
         </div>
 
         {/* Coluna do formulário */}
