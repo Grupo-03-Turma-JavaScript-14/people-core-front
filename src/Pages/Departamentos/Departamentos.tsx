@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pencil, Trash2, Plus, X, ChevronDown, Loader2 } from "lucide-react";
 import "../../Style/Css/Pages/Departamentos.css"
-import {  listarDepartamentos, cadastrarDepartamento, atualizarDepartamento, deletarDepartamento, deletarFuncionario, cadastrarFuncionario, atualizarFuncionario,} from "../../service/Service";
+import {  listarDepartamentos, atualizarDepartamento, deletarDepartamento, deletarFuncionario, cadastrarFuncionario, atualizarFuncionario, cadastrarDepartamento,} from "../../service/Service";
 import { listarFuncionarios } from "../../service/Service";
 import type { Departamento, Funcionario } from "../../service/Types";
 
@@ -661,7 +661,7 @@ useEffect(() => {
               onChange={(e) => setHorasTrabalhadas(e.target.value)}
             />
           </div>
-            
+
           <div className="form-group">
             <label htmlFor="salario-base-func">Salário Base</label>
             <input
