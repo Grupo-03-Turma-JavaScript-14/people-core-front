@@ -2,13 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pencil, Trash2, Plus, X, ChevronDown, Loader2 } from "lucide-react";
 import "../../Style/Css/Pages/Departamentos.css"
-
-import {
-  listarDepartamentos,
-  cadastrarDepartamento,
-  atualizarDepartamento,
-  deletarDepartamento,
-} from "../../service/Service";
+import {  listarDepartamentos, cadastrarDepartamento, atualizarDepartamento, deletarDepartamento, deletarFuncionario, cadastrarFuncionario, atualizarFuncionario,} from "../../service/Service";
 import { listarFuncionarios } from "../../service/Service";
 import type { Departamento, Funcionario } from "../../service/Types";
 
@@ -16,10 +10,12 @@ import type { Departamento, Funcionario } from "../../service/Types";
 // PÁGINA PRINCIPAL
 // ============================================================
 
-function DepartamentosPage() {
+function Departamentos() {
   const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
+  const [quantidadeFuncionarios, setQuantidadeFuncionarios] = useState<Record<number, number>>({})
+  const [expandedDeptId, setExpandedDeptId] = useState<number | null>(null);
 
   // Modal de funcionários
   const [modalFuncionarios, setModalFuncionarios] = useState<{
@@ -37,17 +33,77 @@ function DepartamentosPage() {
     departamento?: Departamento;
   }>({ aberto: false, modo: "criar" });
 
+
   // ── Carregamento inicial ──────────────────────────────────
   useEffect(() => {
-    carregarDepartamentos();
+    refreshData();
   }, []);
+
+const atualizarContagemFuncionarios = async () => {
+  const todosFuncionarios = await listarFuncionarios();
+
+  const contagem: Record<number, number> = {};
+
+  todosFuncionarios.forEach((func) => {
+    const deptId = func.categoria?.id;
+    if (deptId) {
+      contagem[deptId] = (contagem[deptId] || 0) + 1;
+    }
+  });
+
+  setQuantidadeFuncionarios(contagem);
+};
+
+  async function refreshData() {
+  setLoading(true);
+  try {
+    const [dadosDept, todosFuncionarios] = await Promise.all([
+      listarDepartamentos(),
+      listarFuncionarios()
+    ]);
+
+    setDepartamentos(dadosDept);
+
+    const contagem: Record<number, number> = {};
+
+    todosFuncionarios.forEach((func) => {
+      const deptId = func.categoria?.id;
+
+      if (deptId) {
+        contagem[deptId] = (contagem[deptId] || 0) + 1;
+      }
+    });
+
+    setQuantidadeFuncionarios(contagem);
+  } finally {
+    setLoading(false);
+  }
+}
+
+  function handleToggleExpand(id: number) {
+  setExpandedDeptId((prev) => (prev === id ? null : id));
+}
 
   async function carregarDepartamentos() {
     setLoading(true);
     setErro(null);
     try {
-      const dados = await listarDepartamentos();
-      setDepartamentos(dados);
+      const [dadosDept, todosFuncionarios] = await Promise.all ([listarDepartamentos(), listarFuncionarios()]);
+
+      setDepartamentos(dadosDept);
+
+      const contagem: Record<number, number> = {};
+
+    todosFuncionarios.forEach((func) => {
+      const deptId = func.categoria?.id;
+
+      if (deptId) {
+        contagem[deptId] = (contagem[deptId] || 0) + 1;
+      }
+    });
+
+    setQuantidadeFuncionarios(contagem);
+
     } catch {
       setErro("Não foi possível carregar os departamentos.");
     } finally {
@@ -103,6 +159,8 @@ function DepartamentosPage() {
     }
   }
 
+  
+
   // ── Render ───────────────────────────────────────────────
   return (
     <div className="page-container">
@@ -152,6 +210,9 @@ function DepartamentosPage() {
             key={dept.id}
             departamento={dept}
             index={index}
+            totalFuncionarios={quantidadeFuncionarios[dept.id!] || 0}
+            isExpanded={expandedDeptId === dept.id}
+            onToggleExpand={() => handleToggleExpand(dept.id!)}
             onVerFuncionarios={() => abrirFuncionarios(dept)}
             onEditar={() =>
               setModalForm({
@@ -172,12 +233,23 @@ function DepartamentosPage() {
       <AnimatePresence>
         {modalFuncionarios.aberto && (
           <ModalFuncionarios
+            
             nome={modalFuncionarios.departamentoNome ?? ""}
+            departamentoId={modalFuncionarios.departamentoId!}
             funcionarios={funcionariosDept}
             loading={loadingFuncs}
             onClose={() => setModalFuncionarios({ aberto: false })}
+            onUpdateContagem={atualizarContagemFuncionarios}
+            onRefresh={async () => {
+            const todos = await listarFuncionarios();
+              setFuncionariosDept(
+                todos.filter((f) => f.categoria?.id === modalFuncionarios.departamentoId)
+              );
+            }}
           />
         )}
+
+        
       </AnimatePresence>
 
       {/* MODAL: FORM DEPARTAMENTO */}
@@ -202,27 +274,22 @@ function DepartamentosPage() {
 interface CardProps {
   departamento: Departamento;
   index: number;
+  totalFuncionarios: number;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
   onVerFuncionarios: () => void;
   onEditar: () => void;
   onDeletar: () => void;
 }
 
-function DepartamentoCard({
-  departamento,
-  index,
-  onVerFuncionarios,
-  onEditar,
-  onDeletar,
-}: CardProps) {
-  const [expanded, setExpanded] = useState(false);
-  const totalFuncionarios = departamento.funcionarios?.length ?? 0;
+function DepartamentoCard({departamento, index, totalFuncionarios, isExpanded, onToggleExpand, onVerFuncionarios, onEditar, onDeletar,}: CardProps) {
 
   return (
-    <div className={`dept-card ${expanded ? "expanded" : ""}`}>
+    <div className={`dept-card ${isExpanded ? "expanded" : ""}`}>
 
       <div
         className="dept-card-header"
-        onClick={() => setExpanded((prev) => !prev)}
+        onClick={onToggleExpand}
       >
         <div className="header-main">
           <span className="dept-badge">#{String(index + 1).padStart(2, "0")}</span>
@@ -234,7 +301,7 @@ function DepartamentoCard({
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            setExpanded((prev) => !prev);
+            onToggleExpand();
           }}
         >
           <ChevronDown size={18} />
@@ -294,15 +361,33 @@ function DepartamentoCard({
 
 function ModalFuncionarios({
   nome,
+  departamentoId,
   funcionarios,
   loading,
   onClose,
+  onRefresh,
+  onUpdateContagem,
 }: {
   nome: string;
+  departamentoId: number;
   funcionarios: Funcionario[];
   loading: boolean;
   onClose: () => void;
+  onRefresh: () => Promise<void>;
+  onUpdateContagem: () => Promise<void>;
 }) {
+
+  const [modalFuncionario, setModalFuncionario] = useState<{
+    aberto: boolean;
+    modo: "criar" | "editar";
+    funcionario?: Funcionario;
+  }>({
+    aberto: false,
+    modo: "criar",
+  });
+
+  
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <motion.div
@@ -316,11 +401,6 @@ function ModalFuncionarios({
         <div className="modal-header">
           <h2>Funcionários — {nome}</h2>
           <div className="modal-header-actions">
-            <TooltipButton
-              icon={<Plus size={18} />}
-              label="Adicionar funcionário"
-              onClick={() => console.log("novo funcionário")}
-            />
             <button className="close-modal" onClick={onClose}>
               <X size={18} />
             </button>
@@ -348,12 +428,22 @@ function ModalFuncionarios({
                   <TooltipButton
                     label="Editar"
                     icon={<Pencil size={16} />}
-                    onClick={() => console.log("editar", f.id)}
+                    onClick={() =>
+                        setModalFuncionario({
+                          aberto: true,
+                          modo: "editar",
+                          funcionario: f,
+                        })}
                   />
                   <TooltipButton
                     label="Excluir"
                     icon={<Trash2 size={16} />}
-                    onClick={() => console.log("excluir", f.id)}
+                    onClick={async () => {
+                      if (!f.id) return;
+                      await deletarFuncionario(f.id);
+                      await onUpdateContagem();
+                      await onRefresh();
+                    }}
                   />
                 </div>
               </div>
@@ -361,6 +451,25 @@ function ModalFuncionarios({
           )}
         </div>
       </motion.div>
+      {modalFuncionario.aberto && (
+        <ModalFormFuncionario
+          modo={modalFuncionario.modo}
+          funcionario={modalFuncionario.funcionario}
+          departamentoId={departamentoId}
+          onSalvar={async (dados) => {
+            if (modalFuncionario.modo === "criar") {
+              await cadastrarFuncionario(dados);
+            } else {
+              if (!modalFuncionario.funcionario?.id) return;
+              await atualizarFuncionario(modalFuncionario.funcionario.id, dados);
+            }
+            await onRefresh();
+            await onUpdateContagem();
+            setModalFuncionario({ aberto: false, modo: "criar", funcionario: undefined });
+          }}
+          onClose={() => setModalFuncionario({ aberto: false, modo: "criar" })}
+        />
+      )}
     </div>
   );
 }
@@ -449,6 +558,147 @@ function ModalFormDepartamento({
 }
 
 // ============================================================
+// MODAL: FORMULÁRIO CRIAR / EDITAR FUNCIONÁRIO
+// ============================================================
+
+function ModalFormFuncionario({
+  modo,
+  funcionario,
+  departamentoId,
+  onSalvar,
+  onClose,
+}: {
+  modo: "criar" | "editar";
+  funcionario?: Funcionario;
+  departamentoId: number;
+  onSalvar: (dados: Funcionario) => Promise<void>;
+  onClose: () => void;
+}) {
+  const [nome, setNome] = useState("");
+const [cargo, setCargo] = useState("");
+const [horasTrabalhadas, setHorasTrabalhadas] = useState("");
+const [salarioBase, setSalarioBase] = useState("");
+
+useEffect(() => {
+  setNome(funcionario?.nome ?? "");
+  setCargo(funcionario?.cargo ?? "");
+  setHorasTrabalhadas(funcionario?.horasTrabalhadas?.toString() ?? "");
+  setSalarioBase(funcionario?.salarioBase?.toString() ?? "");
+}, [funcionario]);
+
+
+  const [salvando, setSalvando] = useState(false);
+
+  async function handleSubmit() {
+    if (!nome.trim()) {
+      alert("O nome do funcionário é obrigatório.");
+      return;
+    }
+    setSalvando(true);
+    await onSalvar({
+      ...funcionario,
+      nome: nome.trim(),
+      cargo: cargo.trim(),
+      horasTrabalhadas: Number(horasTrabalhadas),
+      salarioBase: Number(salarioBase),
+      categoria: { id: departamentoId },
+    } as Funcionario);
+    setSalvando(false);
+  }
+
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <motion.div
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.95, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 16 }}
+        transition={{ duration: 0.2 }}
+      >
+        <div className="modal-header">
+          <h2>{modo === "criar" ? "Novo Funcionário" : "Editar Funcionário"}</h2>
+          <button className="close-modal" onClick={onClose}>
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="modal-body">
+          <div className="form-group">
+            <label htmlFor="nome-func">Nome</label>
+            <input
+              id="nome-func"
+              type="text"
+              className="form-input"
+              placeholder="Ex: João Silva"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              autoFocus
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="cargo-func">Cargo</label>
+            <input
+              id="cargo-func"
+              type="text"
+              className="form-input"
+              placeholder="Ex: Desenvolvedor"
+              value={cargo}
+              onChange={(e) => setCargo(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="horas-func">Horas Trabalhadas</label>
+            <input
+              id="horas-func"
+              type="number"
+              className="form-input"
+              placeholder="Ex: 160"
+              value={horasTrabalhadas}
+              onChange={(e) => setHorasTrabalhadas(e.target.value)}
+            />
+          </div>
+            
+          <div className="form-group">
+            <label htmlFor="salario-base-func">Salário Base</label>
+            <input
+              id="salario-base-func"
+              type="number"
+              step="0.01"
+              className="form-input"
+              placeholder="Ex: 3500"
+              value={salarioBase}
+              onChange={(e) => setSalarioBase(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="modal-footer">
+          <button className="btn-action edit" onClick={onClose} disabled={salvando}>
+            Cancelar
+          </button>
+          <button className="btn-primary" onClick={handleSubmit} disabled={salvando}>
+            {salvando ? (
+              <>
+                <Loader2 size={15} className="spin" />
+                Salvando...
+              </>
+            ) : modo === "criar" ? (
+              "Criar"
+            ) : (
+              "Salvar"
+            )}
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ============================================================
 // TOOLTIP BUTTON (mantido do original)
 // ============================================================
 
@@ -490,4 +740,4 @@ function TooltipButton({
   );
 }
 
-export default DepartamentosPage;
+export default Departamentos;
