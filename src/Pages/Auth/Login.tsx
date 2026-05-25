@@ -2,6 +2,9 @@ import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../Style/Css/Pages/Login.css';
 
+import { login } from '../../Service/Service';
+import type { UsuarioLogin } from '../../Service/Types';
+
 interface LoginForm {
   email: string;
   senha: string;
@@ -15,15 +18,35 @@ function Login() {
     senha: '',
   });
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    // TODO: integrar com serviço de autenticação
-    console.log('Dados de login:', form);
-    navigate('/');
+    setError('');
+    setLoading(true);
+
+    try {
+      const payload: UsuarioLogin = {
+        usuario: form.email,
+        senha: form.senha,
+      };
+
+      await login(payload); // Service.ts já salva token + usuário no localStorage[cite:83]
+
+      alert('Login realizado com sucesso!');
+      navigate('/'); // hoje "/" já leva para <Testes />[cite:85]
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Erro ao fazer login';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -37,6 +60,12 @@ function Login() {
             alt="PeopleCore"
             className="login-brand__logo"
           />
+          <p className="login-brand__subtitle">
+            Gestão de pessoas que gera resultados.
+          </p>
+          <p className="login-brand__description">
+            Acesse sua conta e continue acompanhando o crescimento da sua equipe.
+          </p>
         </div>
 
         {/* Coluna do formulário */}
@@ -75,17 +104,22 @@ function Login() {
               />
             </div>
 
+            {error && <p className="form-error">{error}</p>}
+
             <div className="login-actions">
-              <button type="submit" className="btn btn-primary">
-                Fazer login
+              <button type="submit" className="btn btn-primary" disabled={loading}>
+                {loading ? 'Entrando...' : 'Fazer login'}
               </button>
+
               <div className="login-divider">
                 <span>Não tem uma conta?</span>
               </div>
+
               <button
                 type="button"
                 className="btn btn-outline"
                 onClick={() => navigate('/cadastro')}
+                disabled={loading}
               >
                 Cadastrar
               </button>
