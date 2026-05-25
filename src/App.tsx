@@ -1,7 +1,7 @@
-import Perfil from "./Pages/Perfil/Perfil";
+import AppRoutes from "./Pages/AppRoutes";
 
 function App() {
-  return <Perfil />;
+  return <AppRoutes />;
 }
 
 export default App;
