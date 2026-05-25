@@ -554,3 +554,168 @@ background: linear-gradient( 90deg, rgba(20, 184, 166, 0.06), transparent 60% );
     transform: scale(1);
   }
 }
+
+/* =========================
+   RESPONSIVIDADE
+========================= */
+
+/* ── Tablet (≤ 768px) ── */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 1.25rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .btn-primary {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .dept-card-header {
+    padding: 1rem 1.25rem;
+  }
+
+  .expand-content-inner {
+    padding: 0 1.25rem;
+  }
+
+  .dept-card.expanded .expand-content-inner {
+    padding: 1.25rem;
+  }
+
+  .crud-actions {
+    justify-content: stretch;
+  }
+
+  .btn-action {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 92dvh;
+    overflow-y: auto;
+  }
+
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-body {
+    padding: 1.25rem;
+  }
+
+  .modal-footer {
+    padding: 1rem 1.25rem;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .employee-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .employee-actions {
+    align-self: flex-end;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+}
+
+/* ── Mobile (≤ 480px) ── */
+@media (max-width: 480px) {
+  .page-container {
+    padding: 0.75rem;
+  }
+
+  .page-header {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .page-header p {
+    font-size: 0.85rem;
+  }
+
+  .dept-title {
+    font-size: 0.95rem;
+  }
+
+  .dept-badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.55rem;
+  }
+
+  .dept-card-header {
+    padding: 0.9rem 1rem;
+  }
+
+  .dept-card.expanded .expand-content-inner {
+    padding: 1rem;
+  }
+
+  .modal-header {
+    padding: 1rem;
+  }
+
+  .modal-header h2 {
+    font-size: 1rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .modal-footer {
+    padding: 0.75rem 1rem;
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  .modal-footer .btn-action.edit,
+  .modal-footer .btn-primary {
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .funcionarios-dept {
+    width: 100%;
+    text-align: center;
+  }
+
+  .departments-list {
+    gap: 0.75rem;
+  }
+
+  .tooltip {
+    display: none; /* toque não tem hover; remove tooltip em mobile */
+  }
+}
