@@ -1,0 +1,260 @@
+/* =============================================
+   Login Page — PeopleCore Design System
+   ============================================= */
+
+.login-page {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gradient-background);
+  padding: 2rem 1rem;
+}
+
+/* Card principal: duas colunas no desktop */
+.login-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  max-width: 860px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+/* ── Coluna de marca ── */
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;  /* centraliza logo e textos */
+  gap: 1rem;
+  padding: 3rem 2.5rem;
+  background: var(--gradient-primary);
+  color: var(--color-text-light);
+  text-align: center;
+}
+
+.login-brand__logo {
+  width: 220px;   /* ajuste o tamanho que achar melhor */
+  height: auto;
+  max-width: 100%;
+}
+
+.login-brand__subtitle {
+  font-size: 0.95rem;
+  opacity: 0.85;
+  font-weight: 400;
+}
+
+.login-brand__description {
+  font-size: 0.875rem;
+  opacity: 0.75;
+  line-height: 1.6;
+  max-width: 28ch;
+}
+
+/* ── Coluna do formulário ── */
+.login-form-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem 2.5rem;
+  background: var(--color-surface);
+}
+
+.login-form-header {
+  margin-bottom: 2rem;
+}
+
+.login-form-header h2 {
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  font-weight: 700;
+  color: var(--color-dark);
+  margin-bottom: 0.25rem;
+}
+
+.login-form-header p {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+/* ── Campos ── */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.form-group label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-dark);
+  letter-spacing: 0.01em;
+}
+
+.form-group input {
+  height: 44px;
+  padding: 0 0.875rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  background: var(--color-background);
+  color: var(--color-text);
+  font-size: 0.9375rem;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+  outline: none;
+  width: 100%;
+}
+
+.form-group input::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+.form-group input:focus {
+  border-color: var(--color-primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+}
+
+.form-group input:hover:not(:focus) {
+  border-color: var(--color-primary-light);
+}
+
+/* ── Botões ── */
+.login-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.btn {
+  height: 52px;
+  width: 75%;
+  padding: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+  border: none;
+  letter-spacing: 0.01em;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: var(--shadow-primary);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-dark);
+  box-shadow: 0 12px 32px rgba(20, 184, 166, 0.35);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-primary-dark);
+  border: 1.5px solid var(--color-primary);
+}
+
+.btn-outline:hover {
+  background: rgba(20, 184, 166, 0.06);
+  border-color: var(--color-primary-dark);
+}
+
+/* Divisor "Não tem uma conta?" */
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.login-divider span {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* Mensagens de erro e estados de erro */
+.form-error {
+  font-size: 0.875rem;
+  color: var(--color-danger);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.18);
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--radius-sm);
+}
+
+.field-error {
+  font-size: 0.75rem;
+  color: var(--color-danger);
+  margin-top: 0.25rem;
+}
+
+.input-error {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.25);
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Responsivo: mobile ── */
+@media (max-width: 640px) {
+  .login-page {
+    padding: 1rem;
+    align-items: flex-start;
+  }
+
+  .login-card {
+    grid-template-columns: 1fr;
+  }
+
+  .login-brand {
+    padding: 2rem 1.5rem 1.5rem;
+    gap: 0.625rem;
+  }
+
+  .login-brand__description {
+    display: none;
+  }
+
+  .login-form-wrapper {
+    padding: 1.75rem 1.5rem 2rem;
+  }
+}
