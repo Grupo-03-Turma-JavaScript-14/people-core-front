@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../Style/Css/Pages/Register.css';
-
+import { toast } from 'react-toastify';
 import { cadastrarUsuario } from '../../Service/Service';
 import type { Usuario } from '../../Service/Types';
 
@@ -83,12 +83,13 @@ function Register() {
       };
 
       await cadastrarUsuario(payload);
-      alert('Usuário cadastrado com sucesso!');
+      toast.success('Usuário cadastrado com sucesso!');
       navigate('/login');
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Erro ao cadastrar usuário';
       setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

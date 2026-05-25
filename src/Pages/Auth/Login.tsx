@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../Style/Css/Pages/Login.css';
-
+import { toast } from 'react-toastify';
 import { login } from '../../Service/Service';
 import type { ApiErrorResponse, UsuarioLogin } from '../../Service/Types';
 import type { AxiosError } from 'axios';
@@ -67,7 +67,7 @@ function Login() {
 
       await login(payload); // Service.ts já salva token e usuário no localStorage[cite:83]
 
-      alert('Login realizado com sucesso!');
+      toast.success('Login realizado com sucesso!');
       navigate('/'); // hoje "/" renderiza <Testes />[cite:85]
     } catch (err) {
   let message = 'Erro ao fazer login';
@@ -88,6 +88,7 @@ function Login() {
   }
 
   setError(message);
+  toast.error(message);
 } finally {
       setLoading(false);
     }
