@@ -32,7 +32,7 @@ function Register() {
   }
 
   function handleCancel() {
-    navigate('/');
+    navigate('/login');
   }
 
   return (
