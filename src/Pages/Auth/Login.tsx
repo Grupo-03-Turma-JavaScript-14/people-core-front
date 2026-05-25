@@ -101,7 +101,7 @@ function Login() {
         {/* Coluna de marca */}
         <div className="login-brand">
           <img
-            src="/peoplecore-logo.png"
+            src="/peoplecore-alt.png"
             alt="PeopleCore"
             className="login-brand__logo"
           />

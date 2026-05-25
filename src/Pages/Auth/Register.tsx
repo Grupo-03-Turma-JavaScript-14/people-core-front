@@ -105,7 +105,7 @@ function Register() {
         {/* Coluna de marca */}
         <div className="register-brand">
           <img
-            src="/peoplecore-logo.png"
+            src="/peoplecore-alt.png"
             alt="PeopleCore"
             className="register-brand__logo-image"
           />
