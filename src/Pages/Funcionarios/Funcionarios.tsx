@@ -10,12 +10,14 @@ import type { Funcionario, Departamento } from "../../Service/Types";
 import Modal from "../../Components/Modal/Modal";
 import "../../Style/Css/Pages/Funcionarios.css";
 
+
 export default function Funcionarios() {
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
   const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
   const [busca, setBusca] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editandoId, setEditandoId] = useState<number | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Campos do formulário
   const [nome, setNome] = useState("");
@@ -39,7 +41,6 @@ export default function Funcionarios() {
     listarDepartamentos().then(setDepartamentos);
   }, []);
 
-  // Resetar formulário e erros
   const resetForm = () => {
     setNome("");
     setCargo("");
@@ -56,13 +57,11 @@ export default function Funcionarios() {
     });
   };
 
-  // Abrir modal para criar
   const handleOpenCreate = () => {
     resetForm();
     setModalOpen(true);
   };
 
-  // Abrir modal para editar
   const handleEdit = (funcionario: Funcionario) => {
     setNome(funcionario.nome);
     setCargo(funcionario.cargo);
@@ -73,9 +72,8 @@ export default function Funcionarios() {
     setModalOpen(true);
   };
 
-  // Exclusão com confirmação nativa
   const handleDelete = (id: number, nome: string) => {
-    if (window.confirm(`Tem certeza que deseja excluir "${nome}"?`)) {
+    if (window.confirm(`Tem certeza que deseja excluir "${nome}"? Essa ação não pode ser desfeita.`)) {
       deletarFuncionario(id).then(() => {
         setFuncionarios((prev) => prev.filter((f) => f.id !== id));
       });
@@ -118,36 +116,38 @@ export default function Funcionarios() {
     return isValid;
   };
 
-  // Salvar (criar ou editar)
-  const handleSave = () => {
-    if (!validateForm()) return;
+  const handleSave = async () => {
+  if (!validateForm()) return;
 
-    const dados = {
-      nome,
-      cargo,
-      horasTrabalhadas,
-      salarioBase,
-      categoria: { id: Number(categoriaId), departamento: "" },
-    };
-
-    if (editandoId !== null) {
-      atualizarFuncionario(editandoId, dados).then((response) => {
-        setFuncionarios((prev) =>
-          prev.map((f) => (f.id === editandoId ? response : f))
-        );
-        setModalOpen(false);
-        resetForm();
-      });
-    } else {
-      cadastrarFuncionario(dados).then((response) => {
-        setFuncionarios((prev) => [...prev, response]);
-        setModalOpen(false);
-        resetForm();
-      });
-    }
+  setIsSubmitting(true);
+  const dados = {
+    nome,
+    cargo,
+    horasTrabalhadas,
+    salarioBase,
+    categoria: { id: Number(categoriaId), departamento: "" },
   };
 
-  // Filtro
+  try {
+    if (editandoId !== null) {
+      await atualizarFuncionario(editandoId, dados);
+    } else {
+      await cadastrarFuncionario(dados);
+    }
+    // 🔁 Recarrega a lista completa para trazer o departamento
+    const funcionariosAtualizados = await listarFuncionarios();
+    setFuncionarios(funcionariosAtualizados);
+    
+    setModalOpen(false);
+    resetForm();
+  } catch (error) {
+    console.error("Erro ao salvar", error);
+    alert("Erro ao salvar funcionário. Tente novamente.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
   const funcionariosFiltrados = funcionarios.filter((f) =>
     f.nome.toLowerCase().includes(busca.toLowerCase())
   );
@@ -162,7 +162,7 @@ export default function Funcionarios() {
         </button>
       </div>
 
-      {/* SEARCH */}
+      {/* BUSCA */}
       <div className="funcionarios-search">
         <input
           type="text"
@@ -179,7 +179,7 @@ export default function Funcionarios() {
             <tr>
               <th>Nome</th>
               <th>Cargo</th>
-              <th>Categoria</th>
+              <th>Departamento</th>
               <th>Horas Trab.</th>
               <th>Salário Base</th>
               <th>Salário Total</th>
@@ -197,9 +197,7 @@ export default function Funcionarios() {
                 <td>R$ {func.salarioTotal}</td>
                 <td className="acoes">
                   <button onClick={() => handleEdit(func)}>✏️</button>
-                  <button
-                    onClick={() => func.id && handleDelete(func.id, func.nome)}
-                  >
+                  <button onClick={() => func.id && handleDelete(func.id, func.nome)}>
                     🗑️
                   </button>
                 </td>
@@ -216,14 +214,14 @@ export default function Funcionarios() {
         </table>
       </div>
 
-      {/* MODAL (seu componente) */}
+      {/* MODAL COM LABELS E VALIDAÇÃO VISUAL */}
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
         <h2>{editandoId ? "Editar Funcionário" : "Novo Funcionário"}</h2>
         <div className="form-funcionario">
-          <div className="form-field">
+          <div className="form-group">
+            <label>Nome completo *</label>
             <input
               type="text"
-              placeholder="Nome"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               className={errors.nome ? "error-input" : ""}
@@ -231,10 +229,10 @@ export default function Funcionarios() {
             {errors.nome && <span className="error-msg">{errors.nome}</span>}
           </div>
 
-          <div className="form-field">
+          <div className="form-group">
+            <label>Cargo *</label>
             <input
               type="text"
-              placeholder="Cargo"
               value={cargo}
               onChange={(e) => setCargo(e.target.value)}
               className={errors.cargo ? "error-input" : ""}
@@ -242,274 +240,50 @@ export default function Funcionarios() {
             {errors.cargo && <span className="error-msg">{errors.cargo}</span>}
           </div>
 
-          <div className="form-field">
+          <div className="form-group">
+            <label>Departamento *</label>
             <select
               value={categoriaId}
               onChange={(e) => setCategoriaId(e.target.value)}
               className={errors.categoriaId ? "error-input" : ""}
             >
-              <option value="">Selecione uma categoria</option>
+              <option value="">Selecione um departamento</option>
               {departamentos.map((depto) => (
                 <option key={depto.id} value={depto.id}>
                   {depto.departamento}
                 </option>
               ))}
             </select>
-            {errors.categoriaId && (
-              <span className="error-msg">{errors.categoriaId}</span>
-            )}
+            {errors.categoriaId && <span className="error-msg">{errors.categoriaId}</span>}
           </div>
 
-          <div className="form-field">
+          <div className="form-group">
+            <label>Horas trabalhadas *</label>
             <input
               type="number"
-              placeholder="Horas Trabalhadas"
               value={horasTrabalhadas}
               onChange={(e) => setHorasTrabalhadas(Number(e.target.value))}
               className={errors.horasTrabalhadas ? "error-input" : ""}
             />
-            {errors.horasTrabalhadas && (
-              <span className="error-msg">{errors.horasTrabalhadas}</span>
-            )}
+            {errors.horasTrabalhadas && <span className="error-msg">{errors.horasTrabalhadas}</span>}
           </div>
 
-          <div className="form-field">
+          <div className="form-group">
+            <label>Salário base (R$) *</label>
             <input
               type="number"
-              placeholder="Salário Base"
               value={salarioBase}
               onChange={(e) => setSalarioBase(Number(e.target.value))}
               className={errors.salarioBase ? "error-input" : ""}
             />
-            {errors.salarioBase && (
-              <span className="error-msg">{errors.salarioBase}</span>
-            )}
+            {errors.salarioBase && <span className="error-msg">{errors.salarioBase}</span>}
           </div>
 
-          <button className="btn-salvar" onClick={handleSave}>
-            {editandoId ? "Salvar Edição" : "Criar"}
+          <button className="btn-novo" onClick={handleSave} disabled={isSubmitting}>
+            {isSubmitting ? "Salvando..." : editandoId ? "Salvar Edição" : "Criar"}
           </button>
         </div>
       </Modal>
     </div>
   );
 }
-// import { useState, useEffect } from "react"
-// import {
-//   listarFuncionarios,
-//   listarDepartamentos,
-//   cadastrarFuncionario,
-//   atualizarFuncionario,
-//   deletarFuncionario
-// } from "../../Service/Service"
-
-// import type { Funcionario, Departamento } from "../../Service/Types"
-// import Modal from "../../Components/Modal/Modal"
-
-// export default function Funcionarios() {
-
-//   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
-//   const [nome, setNome] = useState("")
-//   const [cargo, setCargo] = useState("")
-//   const [categoria, setCategoria] = useState("")
-//   const [horasTrabalhadas, setHorasTrabalhadas] = useState(0)
-//   const [salarioBase, setSalarioBase] = useState(0)
-//   const [editandoId, setEditandoId] = useState<number | null>(null)
-//   const [categorias, setCategorias] = useState<Departamento[]>([])
-//   const [busca, setBusca] = useState("")
-//   const [modalOpen, setModalOpen] = useState(false)
-
-//   useEffect(() => {
-//     listarFuncionarios().then(setFuncionarios)
-//   }, [])
-
-//   useEffect(() => {
-//     listarDepartamentos().then(setCategorias)
-//   }, [])
-
-//   function resetForm() {
-//     setNome("")
-//     setCargo("")
-//     setCategoria("")
-//     setHorasTrabalhadas(0)
-//     setSalarioBase(0)
-//     setEditandoId(null)
-//   }
-
-//   function handleDelete(id: number) {
-//     deletarFuncionario(id).then(() => {
-//       setFuncionarios((prev) =>
-//         prev.filter((f) => f.id !== id)
-//       )
-//     })
-//   }
-
-//   function handleEdit(funcionario: Funcionario) {
-//     setNome(funcionario.nome)
-//     setCargo(funcionario.cargo)
-//     setCategoria(String(funcionario.categoria?.id || ""))
-//     setHorasTrabalhadas(funcionario.horasTrabalhadas)
-//     setSalarioBase(funcionario.salarioBase)
-//     setEditandoId(funcionario.id || null)
-//     setModalOpen(true)
-//   }
-
-//   function handleSave() {
-//     if (!nome || !cargo || !categoria) {
-//       alert("Preencha todos os campos")
-//       return
-//     }
-
-//     const dados = {
-//       nome,
-//       cargo,
-//       horasTrabalhadas,
-//       salarioBase,
-//       categoria: {
-//         id: Number(categoria),
-//         departamento: ""
-//       }
-//     }
-
-//     if (editandoId !== null) {
-//       atualizarFuncionario(editandoId, dados).then((response) => {
-//         setFuncionarios((prev) =>
-//           prev.map((f) =>
-//             f.id === editandoId ? response : f
-//           )
-//         )
-//       })
-//     } else {
-//       cadastrarFuncionario(dados).then((response) => {
-//         setFuncionarios((prev) => [...prev, response])
-//       })
-//     }
-
-//     resetForm()
-//     setModalOpen(false)
-//   }
-
-//   const funcionariosFiltrados = funcionarios.filter((funcionario) =>
-//     funcionario.nome.toLowerCase().includes(busca.toLowerCase())
-//   )
-
-//   return (
-//     <div className="funcionarios-container">
-
-//       {/* HEADER */}
-//       <div className="funcionarios-header">
-//         <h1>Funcionários</h1>
-
-//         <button
-//           className="btn-novo"
-//           onClick={() => {
-//             resetForm()
-//             setModalOpen(true)
-//           }}
-//         >
-//           + Novo Funcionário
-//         </button>
-//       </div>
-
-//       {/* SEARCH */}
-//       <div className="funcionarios-search">
-//         <input
-//           type="text"
-//           placeholder="Buscar funcionário..."
-//           value={busca}
-//           onChange={(e) => setBusca(e.target.value)}
-//         />
-//       </div>
-
-//       {/* TABLE */}
-//       <div className="funcionarios-table">
-//         <table>
-//           <thead>
-//             <tr>
-//               <th>Nome</th>
-//               <th>Cargo</th>
-//               <th>Categoria</th>
-//               <th>Horas Trabalhadas</th>
-//               <th>Salário Base</th>
-//               <th>Salário Total</th>
-//               <th>Ações</th>
-//             </tr>
-//           </thead>
-
-//           <tbody>
-//             {funcionariosFiltrados.map((funcionario) => (
-//               <tr key={funcionario.id}>
-//                 <td>{funcionario.nome}</td>
-//                 <td>{funcionario.cargo}</td>
-//                 <td>{funcionario.categoria?.departamento}</td>
-//                 <td>{funcionario.horasTrabalhadas}</td>
-//                 <td>R$ {funcionario.salarioBase}</td>
-//                 <td>R$ {funcionario.salarioTotal}</td>
-//                 <td className="acoes">
-//                   <button onClick={() => handleEdit(funcionario)}>✏️</button>
-//                   <button onClick={() => funcionario.id && handleDelete(funcionario.id)}>🗑️</button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-
-//       {/* MODAL */}
-//       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
-
-//         <h2>{editandoId ? "Editar Funcionário" : "Novo Funcionário"}</h2>
-
-//         <div className="form-funcionario">
-
-//           <input
-//             type="text"
-//             placeholder="Nome"
-//             value={nome}
-//             onChange={(e) => setNome(e.target.value)}
-//           />
-
-//           <input
-//             type="text"
-//             placeholder="Cargo"
-//             value={cargo}
-//             onChange={(e) => setCargo(e.target.value)}
-//           />
-
-//           <select
-//             value={categoria}
-//             onChange={(e) => setCategoria(e.target.value)}
-//           >
-//             <option value="">Selecione uma categoria</option>
-//             {categorias.map((cat) => (
-//               <option key={cat.id} value={cat.id}>
-//                 {cat.departamento}
-//               </option>
-//             ))}
-//           </select>
-
-//           <input
-//             type="number"
-//             placeholder="Horas Trabalhadas"
-//             value={horasTrabalhadas}
-//             onChange={(e) => setHorasTrabalhadas(Number(e.target.value))}
-//           />
-
-//           <input
-//             type="number"
-//             placeholder="Salário Base"
-//             value={salarioBase}
-//             onChange={(e) => setSalarioBase(Number(e.target.value))}
-//           />
-
-//           <button className="btn-novo" onClick={handleSave}>
-//             {editandoId ? "Salvar Edição" : "Criar"}
-//           </button>
-
-//         </div>
-
-//       </Modal>
-
-//     </div>
-//   )
-// }

@@ -14,10 +14,7 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         
-        <button onClick={onClose} style={{ float: "right" }}>
-          ✖
-        </button>
-
+        <button onClick={onClose}>✖</button>
         {children}
       </div>
     </div>
