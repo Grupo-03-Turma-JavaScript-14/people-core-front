@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import '../../Style/Css/Pages/Login.css';
 
 import { login } from '../../Service/Service';
-import type { UsuarioLogin } from '../../Service/Types';
+import type { ApiErrorResponse, UsuarioLogin } from '../../Service/Types';
+import type { AxiosError } from 'axios';
 
 interface LoginForm {
   email: string;
@@ -20,13 +21,41 @@ function Login() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState<{
+    email?: string;
+    senha?: string;
+  }>({});
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
+  function validateForm() {
+    const newErrors: {
+      email?: string;
+      senha?: string;
+    } = {};
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      newErrors.email = 'Informe um e-mail válido.';
+    }
+
+    if (!form.senha.trim()) {
+      newErrors.senha = 'Informe sua senha.';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     setError('');
     setLoading(true);
 
@@ -36,15 +65,30 @@ function Login() {
         senha: form.senha,
       };
 
-      await login(payload); // Service.ts já salva token + usuário no localStorage[cite:83]
+      await login(payload); // Service.ts já salva token e usuário no localStorage[cite:83]
 
       alert('Login realizado com sucesso!');
-      navigate('/'); // hoje "/" já leva para <Testes />[cite:85]
+      navigate('/'); // hoje "/" renderiza <Testes />[cite:85]
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Erro ao fazer login';
-      setError(message);
-    } finally {
+  let message = 'Erro ao fazer login';
+
+  const axiosError = err as AxiosError<ApiErrorResponse>;
+
+  if (axiosError.response?.status === 401) {
+    // credenciais erradas
+    message = 'Usuário ou senha inválidos.';
+  } else if (axiosError.response?.data?.message) {
+    // mensagem de erro vinda da API (string ou array de strings)
+    const apiMessage = axiosError.response.data.message;
+    message = Array.isArray(apiMessage)
+      ? apiMessage.join(' ')
+      : apiMessage;
+  } else if (err instanceof Error) {
+    message = err.message;
+  }
+
+  setError(message);
+} finally {
       setLoading(false);
     }
   }
@@ -87,7 +131,11 @@ function Login() {
                 onChange={handleChange}
                 required
                 autoComplete="email"
+                className={errors.email ? 'input-error' : ''}
               />
+              {errors.email && (
+                <span className="field-error">{errors.email}</span>
+              )}
             </div>
 
             <div className="form-group">
@@ -101,7 +149,11 @@ function Login() {
                 onChange={handleChange}
                 required
                 autoComplete="current-password"
+                className={errors.senha ? 'input-error' : ''}
               />
+              {errors.senha && (
+                <span className="field-error">{errors.senha}</span>
+              )}
             </div>
 
             {error && <p className="form-error">{error}</p>}

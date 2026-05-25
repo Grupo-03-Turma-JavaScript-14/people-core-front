@@ -24,26 +24,65 @@ function Register() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState<{
+    nome?: string;
+    email?: string;
+    senha?: string;
+    foto?: string;
+  }>({});
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
+  function validateForm() {
+    const newErrors: {
+      nome?: string;
+      email?: string;
+      senha?: string;
+      foto?: string;
+    } = {};
+
+    if (!form.nome.trim()) {
+      newErrors.nome = 'Informe seu nome.';
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      newErrors.email = 'Informe um e-mail válido.';
+    }
+
+    if (form.senha.length < 6) {
+      newErrors.senha = 'A senha deve ter pelo menos 6 caracteres.';
+    }
+
+    if (form.foto && !/^https?:\/\//.test(form.foto)) {
+      newErrors.foto = 'Informe uma URL de foto que comece com http ou https.';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     setError('');
     setLoading(true);
 
     try {
       const payload: Usuario = {
         nome: form.nome,
-        usuario: form.email,   // backend espera "usuario"[cite:84]
+        usuario: form.email,
         senha: form.senha,
         foto: form.foto,
       };
 
-      await cadastrarUsuario(payload); // usa api axios com baseURL "/api"[cite:82][cite:83]
-
+      await cadastrarUsuario(payload);
       alert('Usuário cadastrado com sucesso!');
       navigate('/login');
     } catch (err) {
@@ -96,7 +135,11 @@ function Register() {
                 onChange={handleChange}
                 required
                 autoComplete="name"
+                className={errors.nome ? 'input-error' : ''}
               />
+              {errors.nome && (
+                <span className="field-error">{errors.nome}</span>
+              )}
             </div>
 
             <div className="form-group">
@@ -110,7 +153,11 @@ function Register() {
                 onChange={handleChange}
                 required
                 autoComplete="email"
+                className={errors.email ? 'input-error' : ''}
               />
+              {errors.email && (
+                <span className="field-error">{errors.email}</span>
+              )}
             </div>
 
             <div className="form-group">
@@ -122,14 +169,19 @@ function Register() {
                 placeholder="https://..."
                 value={form.foto}
                 onChange={handleChange}
+                className={errors.foto ? 'input-error' : ''}
               />
-              {form.foto && (
+              {errors.foto && (
+                <span className="field-error">{errors.foto}</span>
+              )}
+              {form.foto && !errors.foto && (
                 <div className="foto-preview">
                   <img
                     src={form.foto}
                     alt="Prévia da foto de perfil"
                     onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.display = 'none';
+                      (e.currentTarget as HTMLImageElement).style.display =
+                        'none';
                     }}
                   />
                 </div>
@@ -148,7 +200,11 @@ function Register() {
                 required
                 minLength={6}
                 autoComplete="new-password"
+                className={errors.senha ? 'input-error' : ''}
               />
+              {errors.senha && (
+                <span className="field-error">{errors.senha}</span>
+              )}
             </div>
 
             {error && <p className="form-error">{error}</p>}

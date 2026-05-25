@@ -249,4 +249,14 @@
   height: auto;
   max-width: 100%;
 }
+.field-error {
+  font-size: 0.75rem;
+  color: var(--color-danger);
+  margin-top: 0.25rem;
+}
+
+.input-error {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.25);
+}
 }
