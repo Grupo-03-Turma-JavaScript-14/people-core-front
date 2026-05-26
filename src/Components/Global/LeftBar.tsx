@@ -9,10 +9,12 @@ import {
   FaUser,
   FaSignOutAlt,
 } from "react-icons/fa";
+
 import { logout, getUsuarioLogado } from "../../Service/Service";
 
 export const LeftBar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -52,8 +54,8 @@ export const LeftBar: React.FC = () => {
   ];
 
   return (
-    <div
-      className={`h-screen bg-[#012b2c] flex flex-col p-5 relative transition-all duration-300 box-border shrink-0 ${
+    <aside
+      className={`fixed left-0 top-0 z-50 h-screen bg-[#012b2c] flex flex-col p-5 transition-all duration-300 box-border ${
         isCollapsed ? "w-20" : "w-[260px]"
       }`}
     >
@@ -63,7 +65,11 @@ export const LeftBar: React.FC = () => {
         type="button"
         aria-label={isCollapsed ? "Expandir menu" : "Recolher menu"}
       >
-        {isCollapsed ? <FaChevronRight size={12} /> : <FaChevronLeft size={12} />}
+        {isCollapsed ? (
+          <FaChevronRight size={12} />
+        ) : (
+          <FaChevronLeft size={12} />
+        )}
       </button>
 
       <div
@@ -140,7 +146,9 @@ export const LeftBar: React.FC = () => {
         {user ? (
           <div
             className={`flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-2.5 ${
-              isCollapsed ? "justify-center p-2 bg-transparent border-none" : ""
+              isCollapsed
+                ? "justify-center p-2 bg-transparent border-none flex-col"
+                : ""
             }`}
           >
             {user.avatarUrl ? (
@@ -179,7 +187,7 @@ export const LeftBar: React.FC = () => {
 
             {isCollapsed && (
               <button
-                className="text-[#9cb1b2] hover:text-red-400 cursor-pointer flex items-center justify-center transition-colors bg-transparent border-none mt-2"
+                className="text-[#9cb1b2] hover:text-red-400 cursor-pointer flex items-center justify-center transition-colors bg-transparent border-none"
                 onClick={handleLogout}
                 title="Sair"
                 type="button"
@@ -196,6 +204,8 @@ export const LeftBar: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </aside>
   );
 };
+
+export default LeftBar;
