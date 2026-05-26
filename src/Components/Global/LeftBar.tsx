@@ -55,7 +55,7 @@ export const LeftBar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-50 h-screen bg-[#012b2c] flex flex-col p-5 transition-all duration-300 box-border ${
+      className={`sticky top-0 left-0 h-screen bg-[#012b2c] flex flex-col p-5 transition-all duration-300 box-border shrink-0 ${
         isCollapsed ? "w-20" : "w-[260px]"
       }`}
     >
