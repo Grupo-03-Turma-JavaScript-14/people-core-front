@@ -39,7 +39,7 @@ const equipe = [
   {
     nome: "Taís Bernardini",
     cargo: "Desenvolvedor",
-    foto: "/AboutUs/tais-bernardini.png",
+    foto: "/AboutUs/tais-bernardi.png",
   },
 ];
 
