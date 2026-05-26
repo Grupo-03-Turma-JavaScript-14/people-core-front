@@ -3,25 +3,26 @@ import { LeftBar } from "./Components/Global/LeftBar";
 import { Footer } from "./Components/Global/Footer";
 import AppRoutes from "../AppRoutes";
 
-const AUTH_ROUTES = ["/login", "/cadastro"];
+// Rotas que NÃO mostram sidebar/footer interno (têm layout próprio)
+const NO_LAYOUT_ROUTES = ["/login", "/cadastro", "/", "/sobre"];
 
 function Layout() {
   const location = useLocation();
-  const isAuthPage = AUTH_ROUTES.includes(location.pathname);
+  const isNoLayout = NO_LAYOUT_ROUTES.includes(location.pathname);
 
-  if (isAuthPage) {
-    return (
-      <div className="min-h-screen w-screen bg-[#011a1b] flex items-center justify-center">
-        <AppRoutes />
-      </div>
-    );
+  if (isNoLayout) {
+    return <AppRoutes />;
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'stretch', minHeight: '100vh', width: '100vw' }}>
-      <LeftBar />
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: '100vh', overflowY: 'auto' }}>
-        <main style={{ flex: 1, padding: '2rem' }}>
+    <div className="flex w-screen h-screen overflow-hidden">
+      {/* Sidebar fixa */}
+      <div className="shrink-0 h-screen sticky top-0">
+        <LeftBar />
+      </div>
+      {/* Conteúdo principal */}
+      <div className="flex flex-col flex-1 h-screen overflow-y-auto">
+        <main className="flex-1 p-0">
           <AppRoutes />
         </main>
         <Footer />

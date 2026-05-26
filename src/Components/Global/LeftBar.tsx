@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaHome, FaUsers, FaBuilding, FaSignOutAlt } from 'react-icons/fa';
 import { logout, getUsuarioLogado } from '../../Service/Service';
@@ -49,8 +49,8 @@ export const LeftBar: React.FC = () => {
       {/* Home */}
       <div className="mb-7">
         <button
-          className={`w-full bg-[#008b94] border-none rounded-xl p-3.5 text-white flex items-center gap-4 text-base font-bold cursor-pointer shadow-lg transition-transform active:scale-[0.98] ${isCollapsed ? 'justify-center' : ''}`}
-          onClick={() => navigate('/funcionarios')}
+          className={`w-full border-none rounded-xl p-3.5 text-white flex items-center gap-4 text-base font-bold cursor-pointer shadow-lg transition-all active:scale-[0.98] ${isCollapsed ? 'justify-center' : ''} ${isActive('/home') ? 'bg-[#006b73]' : 'bg-[#008b94] hover:bg-[#007880]'}`}
+          onClick={() => navigate('/home')}
         >
           <FaHome className="text-lg shrink-0" />
           {!isCollapsed && <span>Home</span>}
