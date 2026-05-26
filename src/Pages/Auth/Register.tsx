@@ -1,6 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../../Style/Css/Pages/Register.css';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { cadastrarUsuario } from '../../Service/Service';
 import type { Usuario } from '../../Service/Types';
@@ -14,211 +13,140 @@ interface RegisterForm {
 
 function Register() {
   const navigate = useNavigate();
-
-  const [form, setForm] = useState<RegisterForm>({
-    nome: '',
-    email: '',
-    foto: '',
-    senha: '',
-  });
-
+  const [form, setForm] = useState<RegisterForm>({ nome: '', email: '', foto: '', senha: '' });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [errors, setErrors] = useState<{
-    nome?: string;
-    email?: string;
-    senha?: string;
-    foto?: string;
-  }>({});
+  const [errors, setErrors] = useState<Partial<RegisterForm>>({});
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
+    // Limpa o erro do campo ao digitar
+    if (errors[e.target.name as keyof RegisterForm]) {
+      setErrors({ ...errors, [e.target.name]: '' });
+    }
   }
 
-  function validateForm() {
-    const newErrors: {
-      nome?: string;
-      email?: string;
-      senha?: string;
-      foto?: string;
-    } = {};
-
-    if (!form.nome.trim()) {
-      newErrors.nome = 'Informe seu nome.';
-    }
-
+  function validateForm(): boolean {
+    const newErrors: Partial<RegisterForm> = {};
+    if (!form.nome.trim()) newErrors.nome = 'Nome é obrigatório.';
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(form.email)) {
-      newErrors.email = 'Informe um e-mail válido.';
-    }
-
-    if (form.senha.length < 6) {
-      newErrors.senha = 'A senha deve ter pelo menos 6 caracteres.';
-    }
-
-    if (form.foto && !/^https?:\/\//.test(form.foto)) {
-      newErrors.foto = 'Informe uma URL de foto que comece com http ou https.';
-    }
-
+    if (!emailRegex.test(form.email)) newErrors.email = 'Informe um e-mail válido.';
+    if (form.foto && !/^https?:\/\//.test(form.foto)) newErrors.foto = 'URL deve começar com http ou https.';
+    if (form.senha.length < 6) newErrors.senha = 'A senha deve ter pelo menos 6 caracteres.';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setError('');
+    if (!validateForm()) return;
     setLoading(true);
-
     try {
       const payload: Usuario = {
         nome: form.nome,
-        usuario: form.email,
+        usuario: form.email,   
         senha: form.senha,
-        foto: form.foto,
+        foto: form.foto || undefined,
       };
-
       await cadastrarUsuario(payload);
-      toast.success('Usuário cadastrado com sucesso!');
+      toast.success('Conta criada com sucesso! Faça login.');
       navigate('/login');
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Erro ao cadastrar usuário';
-      setError(message);
-      toast.error(message);
+    } catch (err: unknown) {
+      // Exibe mensagem específica da API se disponível
+      const msg =
+        err instanceof Error
+          ? err.message
+          : 'Erro ao cadastrar. Verifique os dados e tente novamente.';
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
   }
 
-  function handleCancel() {
-    navigate('/login');
-  }
+  const fields = [
+    { label: 'Nome completo',       name: 'nome'  as const, type: 'text',     placeholder: 'Seu nome',           required: true },
+    { label: 'E-mail',              name: 'email' as const, type: 'email',    placeholder: 'seu@email.com',      required: true },
+    { label: 'URL da foto de perfil', name: 'foto' as const, type: 'text',   placeholder: 'https://...',        required: false },
+    { label: 'Senha',               name: 'senha' as const, type: 'password', placeholder: 'Mínimo 6 caracteres', required: true },
+  ];
 
   return (
-    <div className="register-page">
-      <div className="register-card">
-        {/* Coluna de marca */}
-        <div className="register-brand">
-          <img
-            src="/peoplecore-alt.png"
-            alt="PeopleCore"
-            className="register-brand__logo-image"
-          />
+
+    <div
+      className="w-full min-h-screen flex items-center justify-center p-4"
+      style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)' }}
+    >
+      <div
+        className="w-full max-w-4xl bg-white rounded-2xl flex flex-col md:flex-row overflow-hidden"
+        style={{ boxShadow: '0 16px 40px rgba(15, 23, 42, 0.5)' }}
+      >
+
+        <div
+          className="w-full md:w-1/2 flex flex-col items-center justify-center p-12"
+          style={{ background: 'linear-gradient(135deg, #14B8A6 0%, #5EEAD4 100%)' }}
+        >
+          <div className="w-full max-w-[280px]">
+            <img
+              src="/logoa.png"
+              alt="PeopleCore Logo"
+              className="w-full h-auto object-contain drop-shadow-lg"
+            />
+          </div>
         </div>
 
-        {/* Coluna do formulário */}
-        <div className="register-form-wrapper">
-          <div className="register-form-header">
-            <h2>Criar conta</h2>
-            <p>Preencha os campos abaixo para se cadastrar</p>
+        {/* Lado Direito: Formulário */}
+        <div className="w-full md:w-1/2 p-10 bg-white flex flex-col justify-center">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-slate-800">Criar conta</h2>
+            <p className="text-slate-400 text-sm mt-1">Preencha os campos abaixo para se cadastrar</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="register-form" noValidate>
-            <div className="form-group">
-              <label htmlFor="nome">Nome completo</label>
-              <input
-                id="nome"
-                name="nome"
-                type="text"
-                placeholder="Seu nome"
-                value={form.nome}
-                onChange={handleChange}
-                required
-                autoComplete="name"
-                className={errors.nome ? 'input-error' : ''}
-              />
-              {errors.nome && (
-                <span className="field-error">{errors.nome}</span>
-              )}
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+            {fields.map((field) => (
+              <div key={field.name} className="flex flex-col space-y-1">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  {field.label}
+                </label>
+                <input
+                  name={field.name}
+                  type={field.type}
+                  placeholder={field.placeholder}
+                  value={form[field.name]}
+                  onChange={handleChange}
+                  required={field.required}
+                  className={`w-full px-4 py-2.5 bg-slate-50 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all placeholder-slate-400 ${
+                    errors[field.name]
+                      ? 'border-red-400 focus:ring-red-300'
+                      : 'border-slate-200 focus:border-[#14B8A6] focus:ring-[#14B8A6]/20'
+                  }`}
+                />
+                {errors[field.name] && (
+                  <span className="text-xs text-red-500">{errors[field.name]}</span>
+                )}
+              </div>
+            ))}
 
-            <div className="form-group">
-              <label htmlFor="email">E-mail</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="seu@email.com"
-                value={form.email}
-                onChange={handleChange}
-                required
-                autoComplete="email"
-                className={errors.email ? 'input-error' : ''}
-              />
-              {errors.email && (
-                <span className="field-error">{errors.email}</span>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="foto">URL da foto de perfil</label>
-              <input
-                id="foto"
-                name="foto"
-                type="text"
-                placeholder="https://..."
-                value={form.foto}
-                onChange={handleChange}
-                className={errors.foto ? 'input-error' : ''}
-              />
-              {errors.foto && (
-                <span className="field-error">{errors.foto}</span>
-              )}
-              {form.foto && !errors.foto && (
-                <div className="foto-preview">
-                  <img
-                    src={form.foto}
-                    alt="Prévia da foto de perfil"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.display =
-                        'none';
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="senha">Senha</label>
-              <input
-                id="senha"
-                name="senha"
-                type="password"
-                placeholder="Mínimo 6 caracteres"
-                value={form.senha}
-                onChange={handleChange}
-                required
-                minLength={6}
-                autoComplete="new-password"
-                className={errors.senha ? 'input-error' : ''}
-              />
-              {errors.senha && (
-                <span className="field-error">{errors.senha}</span>
-              )}
-            </div>
-
-            {error && <p className="form-error">{error}</p>}
-
-            <div className="register-actions">
+            <div className="flex items-center justify-between pt-4">
+            
+              <p className="text-sm text-slate-400">
+                Já tem conta?{' '}
+                <Link to="/login" className="font-bold transition-colors" style={{ color: '#14B8A6' }}>
+                  Entrar
+                </Link>
+              </p>
               <button
-                type="button"
-                className="btn btn-cancel"
-                onClick={handleCancel}
+                type="submit"
                 disabled={loading}
+                className="px-8 py-2.5 text-white text-sm font-bold rounded-lg shadow-md transition-all active:scale-95 disabled:opacity-70"
+                style={{ background: '#14B8A6' }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#0F766E')}
+                onMouseLeave={e => (e.currentTarget.style.background = '#14B8A6')}
               >
-                Cancelar
-              </button>
-              <button type="submit" className="btn btn-primary" disabled={loading}>
                 {loading ? 'Cadastrando...' : 'Cadastrar'}
               </button>
             </div>
           </form>
         </div>
+
       </div>
     </div>
   );

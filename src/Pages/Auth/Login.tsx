@@ -1,48 +1,33 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../../Style/Css/Pages/Login.css';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { login } from '../../Service/Service';
-import type { ApiErrorResponse, UsuarioLogin } from '../../Service/Types';
-import type { AxiosError } from 'axios';
 
 interface LoginForm {
-  email: string;
+  usuario: string;
   senha: string;
 }
 
 function Login() {
   const navigate = useNavigate();
-
-  const [form, setForm] = useState<LoginForm>({
-    email: '',
-    senha: '',
-  });
-
+  const [form, setForm] = useState<LoginForm>({ usuario: '', senha: '' });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [errors, setErrors] = useState<{
-    email?: string;
-    senha?: string;
-  }>({});
+  const [errors, setErrors] = useState<{ usuario?: string; senha?: string }>({});
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function validateForm() {
-    const newErrors: {
-      email?: string;
-      senha?: string;
-    } = {};
-
+  function validateForm(): boolean {
+    const newErrors: { usuario?: string; senha?: string } = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(form.email)) {
-      newErrors.email = 'Informe um e-mail válido.';
+
+    if (!emailRegex.test(form.usuario)) {
+      newErrors.usuario = 'Informe um e-mail válido.';
     }
 
-    if (!form.senha.trim()) {
-      newErrors.senha = 'Informe sua senha.';
+    if (form.senha.length < 6) {
+      newErrors.senha = 'A senha deve ter pelo menos 6 caracteres.';
     }
 
     setErrors(newErrors);
@@ -52,128 +37,127 @@ function Login() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
-    setError('');
     setLoading(true);
 
     try {
-      const payload: UsuarioLogin = {
-        usuario: form.email,
+      await login({
+        usuario: form.usuario,
         senha: form.senha,
-      };
-
-      await login(payload); // Service.ts já salva token e usuário no localStorage[cite:83]
+      });
 
       toast.success('Login realizado com sucesso!');
-      navigate('/'); // hoje "/" renderiza <Testes />[cite:85]
-    } catch (err) {
-  let message = 'Erro ao fazer login';
-
-  const axiosError = err as AxiosError<ApiErrorResponse>;
-
-  if (axiosError.response?.status === 401) {
-    // credenciais erradas
-    message = 'Usuário ou senha inválidos.';
-  } else if (axiosError.response?.data?.message) {
-    // mensagem de erro vinda da API (string ou array de strings)
-    const apiMessage = axiosError.response.data.message;
-    message = Array.isArray(apiMessage)
-      ? apiMessage.join(' ')
-      : apiMessage;
-  } else if (err instanceof Error) {
-    message = err.message;
-  }
-
-  setError(message);
-  toast.error(message);
-} finally {
+      navigate('/home');
+    } catch {
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+      toast.error('E-mail ou senha inválidos.');
+    } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-
-        {/* Coluna de marca */}
-        <div className="login-brand">
-          <img
-            src="/peoplecore-alt.png"
-            alt="PeopleCore"
-            className="login-brand__logo"
-          />
+    <div
+      className="w-full min-h-screen flex items-center justify-center p-4"
+      style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)' }}
+    >
+      <div
+        className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden"
+        style={{ boxShadow: '0 16px 40px rgba(15, 23, 42, 0.5)' }}
+      >
+        <div
+          className="w-full md:w-1/2 flex flex-col items-center justify-center p-12"
+          style={{ background: 'linear-gradient(135deg, #14B8A6 0%, #5EEAD4 100%)' }}
+        >
+          <div className="w-full max-w-[280px]">
+            <img
+              src="/logoa.png"
+              alt="PeopleCore Logo"
+              className="w-full h-auto object-contain drop-shadow-lg"
+            />
+          </div>
         </div>
 
-        {/* Coluna do formulário */}
-        <div className="login-form-wrapper">
-          <div className="login-form-header">
-            <h2>Bem-vindo de volta</h2>
-            <p>Entre com suas credenciais para acessar</p>
+        <div className="w-full md:w-1/2 p-10 bg-white flex flex-col justify-center">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-slate-800">Bem-vindo de volta</h2>
+            <p className="text-slate-400 text-sm mt-1">Faça login para continuar</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="login-form" noValidate>
-            <div className="form-group">
-              <label htmlFor="email">E-mail</label>
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+            <div className="flex flex-col space-y-1">
+              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                E-mail
+              </label>
+
               <input
-                id="email"
-                name="email"
+                name="usuario"
                 type="email"
                 placeholder="seu@email.com"
-                value={form.email}
+                value={form.usuario}
                 onChange={handleChange}
                 required
                 autoComplete="email"
-                className={errors.email ? 'input-error' : ''}
+                className={`w-full px-4 py-2.5 bg-slate-50 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all placeholder-slate-400 ${
+                  errors.usuario
+                    ? 'border-red-400 focus:ring-red-300'
+                    : 'border-slate-200 focus:border-[#14B8A6] focus:ring-[#14B8A6]/20'
+                }`}
               />
-              {errors.email && (
-                <span className="field-error">{errors.email}</span>
-              )}
+
+              {errors.usuario && <span className="text-xs text-red-500">{errors.usuario}</span>}
             </div>
 
-            <div className="form-group">
-              <label htmlFor="senha">Senha</label>
+            <div className="flex flex-col space-y-1">
+              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Senha
+              </label>
+
               <input
-                id="senha"
                 name="senha"
                 type="password"
-                placeholder="Sua senha"
+                placeholder="Mínimo 6 caracteres"
                 value={form.senha}
                 onChange={handleChange}
                 required
                 autoComplete="current-password"
-                className={errors.senha ? 'input-error' : ''}
+                className={`w-full px-4 py-2.5 bg-slate-50 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all placeholder-slate-400 ${
+                  errors.senha
+                    ? 'border-red-400 focus:ring-red-300'
+                    : 'border-slate-200 focus:border-[#14B8A6] focus:ring-[#14B8A6]/20'
+                }`}
               />
-              {errors.senha && (
-                <span className="field-error">{errors.senha}</span>
-              )}
+
+              {errors.senha && <span className="text-xs text-red-500">{errors.senha}</span>}
             </div>
 
-            {error && <p className="form-error">{error}</p>}
-
-            <div className="login-actions">
-              <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? 'Entrando...' : 'Fazer login'}
-              </button>
-
-              <div className="login-divider">
-                <span>Não tem uma conta?</span>
-              </div>
+            <div className="flex items-center justify-between pt-4">
+              <p className="text-sm text-slate-400">
+                Não tem conta?{' '}
+                <Link
+                  to="/cadastro"
+                  className="font-bold transition-colors"
+                  style={{ color: '#14B8A6' }}
+                >
+                  Cadastre-se
+                </Link>
+              </p>
 
               <button
-                type="button"
-                className="btn btn-outline"
-                onClick={() => navigate('/cadastro')}
+                type="submit"
                 disabled={loading}
+                className="px-8 py-2.5 text-white text-sm font-bold rounded-lg shadow-md transition-all active:scale-95 disabled:opacity-70"
+                style={{ background: '#14B8A6' }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#0F766E')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = '#14B8A6')}
               >
-                Cadastrar
+                {loading ? 'Entrando...' : 'Entrar'}
               </button>
             </div>
           </form>
         </div>
-
       </div>
     </div>
   );
