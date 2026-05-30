@@ -1,23 +1,11 @@
-import { ToastContainer } from "react-toastify";
-import AppRoutes from "./Pages/AppRoutes";
-import 'react-toastify/dist/ReactToastify.css';
+import { BrowserRouter } from 'react-router-dom';
+import AppRoutes from './Pages/AppRoutes';
 
 function App() {
   return (
-    <>
+    <BrowserRouter>
       <AppRoutes />
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
-      />
-    </>
+    </BrowserRouter>
   );
 }
 

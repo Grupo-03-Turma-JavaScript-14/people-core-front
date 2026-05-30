@@ -84,7 +84,14 @@ export async function buscarUsuarioPorNome(nome: string): Promise<Usuario[]> {
 }
 
 export async function atualizarUsuario(usuario: Usuario): Promise<Usuario> {
-  const response = await api.put<Usuario>("/usuarios", usuario);
+  const token = getToken();
+
+  const response = await api.put<Usuario>("/usuarios", usuario, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
   return response.data;
 }
 

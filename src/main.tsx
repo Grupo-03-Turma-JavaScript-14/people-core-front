@@ -1,14 +1,29 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
 
-import App from "./App";
-import "./Style/Css/Global/global.css";
+import { ToastContainer } from 'react-toastify'
 
-createRoot(document.getElementById("root")!).render(
+import 'react-toastify/dist/ReactToastify.css'
+
+import './Style/Css/Global/global.css'
+
+import App from './App.tsx'
+
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </StrictMode>
-);
+
+    <App />
+
+    <ToastContainer
+      position="top-right"
+      autoClose={2600}
+      hideProgressBar={false}
+      newestOnTop
+      closeOnClick
+      pauseOnHover
+      draggable
+      theme="dark"
+    />
+
+  </StrictMode>,
+)
