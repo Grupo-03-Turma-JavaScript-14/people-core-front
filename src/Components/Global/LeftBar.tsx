@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   FaChevronLeft,
@@ -11,9 +11,15 @@ import {
 } from "react-icons/fa";
 
 import { logout, getUsuarioLogado } from "../../Service/Service";
+import {
+  obterAvatarLocal,
+  USER_AVATAR_UPDATED_EVENT,
+} from "../../Utils/userAvatar";
+import "../../Style/Css/Components/Global/LeftBar.css";
 
 export const LeftBar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [avatarLocal, setAvatarLocal] = useState(() => obterAvatarLocal());
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -24,9 +30,28 @@ export const LeftBar: React.FC = () => {
     ? {
         name: usuarioLogado.nome ?? usuarioLogado.usuario,
         role: "Admin",
-        avatarUrl: usuarioLogado.foto ?? "",
+        avatarUrl: avatarLocal || usuarioLogado.foto || "",
       }
     : null;
+
+  useEffect(() => {
+    function atualizarAvatar(evento: Event) {
+      const avatar = (evento as CustomEvent<string>).detail;
+      setAvatarLocal(avatar || obterAvatarLocal());
+    }
+
+    function sincronizarStorage() {
+      setAvatarLocal(obterAvatarLocal());
+    }
+
+    window.addEventListener(USER_AVATAR_UPDATED_EVENT, atualizarAvatar);
+    window.addEventListener("storage", sincronizarStorage);
+
+    return () => {
+      window.removeEventListener(USER_AVATAR_UPDATED_EVENT, atualizarAvatar);
+      window.removeEventListener("storage", sincronizarStorage);
+    };
+  }, []);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -55,12 +80,14 @@ export const LeftBar: React.FC = () => {
 
   return (
     <aside
-      className={`sticky top-0 left-0 h-screen bg-[#012b2c] flex flex-col p-5 transition-all duration-300 box-border shrink-0 ${
-        isCollapsed ? "w-20" : "w-[260px]"
+      className={`leftbar fixed top-0 left-0 bg-[#012b2c] flex flex-col p-5 transition-all duration-300 box-border ${
+        isCollapsed
+          ? "w-20 leftbar--collapsed"
+          : "w-[260px] leftbar--expanded"
       }`}
     >
       <button
-        className="absolute top-[25px] right-[-15px] w-7 h-7 bg-[#008b94] border-none rounded-full text-white flex items-center justify-center cursor-pointer shadow-md z-10"
+        className="absolute top-[25px] right-[-15px] w-7 h-7 bg-[#008b94] border-none rounded-full text-white flex items-center justify-center cursor-pointer shadow-md z-10 leftbar__collapse"
         onClick={() => setIsCollapsed(!isCollapsed)}
         type="button"
         aria-label={isCollapsed ? "Expandir menu" : "Recolher menu"}
@@ -75,7 +102,7 @@ export const LeftBar: React.FC = () => {
       <div
         className={`bg-white rounded-xl p-3 flex items-center gap-3 mb-6 overflow-hidden ${
           isCollapsed ? "justify-center py-3 px-0" : ""
-        }`}
+        } leftbar__brand`}
       >
         <div className="flex items-center justify-center w-11 h-11 shrink-0">
           <img
@@ -95,7 +122,7 @@ export const LeftBar: React.FC = () => {
         )}
       </div>
 
-      <div className="mb-7">
+      <div className="mb-7 leftbar__home">
         <button
           className={`w-full bg-[#008b94] border-none rounded-xl p-3.5 text-white flex items-center gap-4 text-base font-bold cursor-pointer shadow-lg transition-transform active:scale-[0.98] ${
             isCollapsed ? "justify-center" : ""
@@ -108,7 +135,7 @@ export const LeftBar: React.FC = () => {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto leftbar__navigation">
         {!isCollapsed ? (
           <p className="text-[#00bac7] text-xs font-bold ml-1 mb-4 tracking-wider">
             GESTÃO DE PESSOAS
@@ -117,11 +144,11 @@ export const LeftBar: React.FC = () => {
           <hr className="border-0 border-t border-white/10 my-4" />
         )}
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 leftbar__navigation-items">
           {navItems.map(({ path, icon, label }) => (
             <div
               key={path}
-              className={`flex items-center gap-4 p-3 rounded-lg cursor-pointer transition-all duration-200 text-sm ${
+              className={`flex items-center gap-4 p-3 rounded-lg cursor-pointer transition-all duration-200 text-sm leftbar__nav-item ${
                 isActive(path)
                   ? "bg-white/10 text-white"
                   : "text-[#9cb1b2] hover:bg-white/5 hover:text-white"
@@ -142,7 +169,7 @@ export const LeftBar: React.FC = () => {
         </div>
       </div>
 
-      <div className="mt-auto">
+      <div className="mt-auto leftbar__user-area">
         {user ? (
           <div
             className={`flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-2.5 ${

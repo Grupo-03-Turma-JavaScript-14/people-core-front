@@ -36,6 +36,8 @@
 
 .home {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 100vh;
   background:
     radial-gradient(circle at top left, rgba(92, 225, 210, 0.18), transparent 32%),
@@ -47,6 +49,7 @@
 
 .home__dashboard {
   width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -178,16 +181,6 @@
   }
 }
 
-@keyframes homeDonutSpin {
-  from {
-    transform: rotate(-18deg);
-  }
-
-  to {
-    transform: rotate(342deg);
-  }
-}
-
 /* =========================
    TOPBAR
 ========================= */
@@ -205,6 +198,7 @@
   backdrop-filter: blur(14px);
   position: relative;
   z-index: 20;
+  min-width: 0;
 }
 
 .home__welcome h1 {
@@ -318,6 +312,26 @@
   transform: translateX(3px);
 }
 
+.home__search-results button.home__search-result--selected {
+  background: var(--home-primary-lighter);
+  box-shadow: inset 3px 0 0 var(--home-primary);
+}
+
+.home__search-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.home__search-result-header small {
+  color: var(--home-primary);
+  background: var(--home-primary-soft);
+  border-radius: 999px;
+  padding: 0.18rem 0.5rem;
+  font-weight: 800;
+}
+
 .home__search-results strong {
   color: var(--home-text);
   font-size: 0.88rem;
@@ -358,6 +372,16 @@
     background var(--home-transition);
 }
 
+.home__shortcut svg {
+  color: var(--home-primary);
+  transition: transform var(--home-transition), color var(--home-transition);
+}
+
+.home__shortcut:hover svg {
+  transform: translateX(2px);
+  color: var(--home-primary-dark);
+}
+
 .home__notification:hover,
 .home__shortcut:hover {
   transform: translateY(-2px);
@@ -368,6 +392,10 @@
 
 .home__notification:hover .home__bell {
   animation: homeBellRing 550ms ease;
+}
+
+.home__notification-area {
+  position: relative;
 }
 
 .home__notification small {
@@ -475,12 +503,27 @@
 }
 
 .home__notification-popover li {
+  border-radius: 12px;
+  background: var(--home-surface-soft);
+  overflow: hidden;
+}
+
+.home__notification-popover li > button {
+  width: 100%;
   display: flex;
   justify-content: space-between;
   gap: 0.9rem;
   padding: 0.65rem;
-  border-radius: 12px;
-  background: var(--home-surface-soft);
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--home-transition);
+}
+
+.home__notification-popover li > button:hover,
+.home__notification-popover li > button:focus-visible {
+  background: var(--home-primary-lighter);
 }
 
 .home__notification-popover li strong {
@@ -499,6 +542,30 @@
   font-size: 0.7rem;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.home__data-status {
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  color: var(--home-primary-dark);
+  background: var(--home-primary-soft);
+  border: 1px solid var(--home-border);
+  border-radius: var(--home-radius-sm);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.home__data-status--error {
+  color: #9f1239;
+  background: #fff1f2;
+  border-color: #fecdd3;
+}
+
+.home__empty-message {
+  margin: 0;
+  color: var(--home-muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
 }
 
 /* =========================
@@ -628,6 +695,12 @@
   letter-spacing: -0.04em;
 }
 
+.home__metric-card .home__metric-value--currency {
+  font-size: clamp(1.15rem, 1.6vw, 1.55rem);
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+
 .home__metric-card div > span {
   display: block;
   margin-top: 0.38rem;
@@ -725,15 +798,15 @@
 
 .home__chart-content {
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: minmax(210px, 260px) 1fr;
   align-items: center;
   gap: 1.4rem;
 }
 
 .home__donut {
-  width: 220px;
-  height: 220px;
-  border-radius: 999px;
+  width: min(220px, 100%);
+  aspect-ratio: 1;
+  border-radius: 50%;
   margin: auto;
   background:
     radial-gradient(circle, #ffffff 0 38%, transparent 39%),
@@ -747,7 +820,7 @@
   display: grid;
   place-items: center;
   position: relative;
-  animation: homeDonutSpin 900ms ease both;
+  flex: 0 0 auto;
 }
 
 .home__donut::after {
@@ -760,15 +833,19 @@
 }
 
 .home__donut > div {
-  width: 132px;
-  height: 132px;
-  border-radius: 999px;
+  position: absolute;
+  inset: 20%;
+  width: auto;
+  height: auto;
+  border-radius: 50%;
   background: #ffffff;
-  display: grid;
-  place-items: center;
-  align-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   box-shadow: inset 0 0 0 1px var(--home-border);
   text-align: center;
+  padding: 0.75rem;
 }
 
 .home__donut strong {
@@ -780,7 +857,7 @@
 
 .home__donut span {
   margin-top: 0.25rem;
-  max-width: 92px;
+  max-width: 100px;
   color: var(--home-muted);
   font-size: 0.72rem;
   line-height: 1.2;
@@ -839,63 +916,64 @@
 }
 
 /* =========================
-   ANIVERSARIANTES
+   PANORAMA FINANCEIRO
 ========================= */
 
-.home__birthday-list {
+.home__financial-overview {
   display: grid;
-  gap: 0.85rem;
+  gap: 1rem;
 }
 
-.home__birthday-list article {
+.home__financial-highlight {
+  padding: 1.15rem;
+  border-radius: var(--home-radius-md);
+  background: linear-gradient(135deg, var(--home-primary-dark), var(--home-primary));
+  color: #ffffff;
+}
+
+.home__financial-highlight span,
+.home__financial-highlight small {
+  display: block;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.home__financial-highlight strong {
+  display: block;
+  margin: 0.35rem 0;
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  line-height: 1;
+}
+
+.home__financial-list {
+  margin: 0;
   display: grid;
-  grid-template-columns: 52px 1fr auto;
+  gap: 0.65rem;
+}
+
+.home__financial-list div {
+  display: flex;
   align-items: center;
-  gap: 0.8rem;
-  min-width: 0;
-  padding: 0.55rem;
-  border-radius: 15px;
-  transition:
-    background var(--home-transition),
-    transform var(--home-transition);
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 12px;
+  background: var(--home-surface-soft);
 }
 
-.home__birthday-list article:hover {
-  background: var(--home-primary-lighter);
-  transform: translateX(4px);
-}
-
-.home__birthday-list img {
-  width: 52px;
-  height: 52px;
-  border-radius: 999px;
-  object-fit: cover;
-  object-position: center;
-  background: linear-gradient(135deg, #eef5f6, #ffffff);
-  border: 3px solid #ffffff;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
-}
-
-.home__birthday-list strong {
-  display: block;
-  color: #263449;
-  font-size: 0.9rem;
-  font-weight: 900;
-}
-
-.home__birthday-list span {
-  display: block;
-  margin-top: 0.12rem;
+.home__financial-list dt {
   color: var(--home-muted);
   font-size: 0.78rem;
   font-weight: 700;
 }
 
-.home__birthday-list small {
-  color: var(--home-muted);
+.home__financial-list dd {
+  margin: 0;
+  color: var(--home-text);
   font-size: 0.82rem;
   font-weight: 900;
-  white-space: nowrap;
+  text-align: right;
 }
 
 /* =========================
@@ -942,10 +1020,30 @@
   font-weight: 800;
 }
 
+.home__activity-list li > div {
+  min-width: 0;
+}
+
+.home__activity-list li > div small {
+  display: block;
+  margin-top: 0.15rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .home__activity-list small {
   color: var(--home-muted);
   font-size: 0.78rem;
   white-space: nowrap;
+}
+
+.home__activity-list button {
+  border: 0;
+  background: transparent;
+  color: var(--home-primary);
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
 }
 
 /* =========================
@@ -1092,6 +1190,104 @@
 }
 
 /* =========================
+   DISTRIBUIÇÃO POR SETOR
+========================= */
+
+.home__allocation {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.55fr) minmax(260px, 1.45fr);
+  align-items: stretch;
+  gap: 1rem;
+}
+
+.home__allocation-summary {
+  min-height: 210px;
+  padding: 1.25rem;
+  border-radius: var(--home-radius-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top right, rgba(92, 225, 210, 0.3), transparent 45%),
+    linear-gradient(145deg, var(--home-primary-dark), var(--home-primary));
+  color: #ffffff;
+}
+
+.home__allocation-summary span,
+.home__allocation-summary small {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.home__allocation-summary strong {
+  margin: 0.35rem 0;
+  font-size: clamp(2.6rem, 5vw, 4rem);
+  line-height: 1;
+  font-weight: 900;
+}
+
+.home__allocation .home__department-list {
+  padding: 0.25rem;
+  align-content: center;
+  gap: 0.85rem;
+}
+
+.home__allocation .home__department-list li {
+  display: block;
+}
+
+.home__department-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.4rem;
+  color: #435166;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.home__department-name {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home__department-name i {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+}
+
+.home__department-row strong {
+  color: #101827;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.home__department-progress {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e7f0f1;
+}
+
+.home__department-progress span {
+  display: block;
+  height: 100%;
+  min-width: 6px;
+  border-radius: inherit;
+  transition: width 500ms ease;
+}
+
+/* =========================
    RESPONSIVO
 ========================= */
 
@@ -1116,6 +1312,10 @@
   .home__chart-content {
     grid-template-columns: 240px 1fr;
   }
+
+  .home__allocation {
+    grid-template-columns: minmax(170px, 0.5fr) minmax(260px, 1.5fr);
+  }
 }
 
 @media (max-width: 760px) {
@@ -1134,14 +1334,16 @@
     grid-template-columns: 1fr;
   }
 
-  .home__donut {
-    width: 190px;
-    height: 190px;
+  .home__allocation {
+    grid-template-columns: 1fr;
   }
 
-  .home__donut > div {
-    width: 116px;
-    height: 116px;
+  .home__allocation-summary {
+    min-height: 150px;
+  }
+
+  .home__donut {
+    width: min(190px, 78vw);
   }
 
   .home__activity-list li {
@@ -1152,14 +1354,6 @@
     grid-column: 2;
   }
 
-  .home__birthday-list article {
-    grid-template-columns: 48px 1fr;
-  }
-
-  .home__birthday-list small {
-    grid-column: 2;
-  }
-
   .home__news-card {
     width: 300px;
     min-width: 300px;
@@ -1167,6 +1361,31 @@
 }
 
 @media (max-width: 520px) {
+  .home__dashboard {
+    gap: 0.8rem;
+  }
+
+  .home__topbar,
+  .home__panel,
+  .home__news,
+  .home__metric-card {
+    padding: 0.9rem;
+  }
+
+  .home__top-actions {
+    justify-content: space-between;
+  }
+
+  .home__notification-popover {
+    position: fixed;
+    left: 1rem;
+    right: 1rem;
+    top: 1rem;
+    width: auto;
+    max-height: calc(100vh - 5.5rem);
+    overflow-y: auto;
+  }
+
   .home__search {
     grid-template-columns: auto 1fr;
   }
@@ -1182,6 +1401,52 @@
 
   .home__metric-card {
     align-items: flex-start;
+  }
+
+  .home__metric-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+  }
+
+  .home__metric-card strong {
+    font-size: 1.55rem;
+  }
+
+  .home__metric-card .home__metric-value--currency {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .home__financial-list div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .home__financial-list dd {
+    text-align: left;
+  }
+
+  .home__department-row {
+    align-items: flex-start;
+  }
+
+  .home__department-name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+  }
+
+  .home__activity-list li {
+    grid-template-columns: 54px minmax(0, 1fr);
+  }
+
+  .home__activity-list button {
+    grid-column: 2;
+    justify-self: start;
+    padding: 0;
   }
 
   .home__news-card {

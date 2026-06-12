@@ -3,6 +3,7 @@ import { api } from "./api";
 import type {
   Departamento,
   Funcionario,
+  FuncionarioPayload,
   Usuario,
   UsuarioLogin,
 } from "./Types";
@@ -175,10 +176,26 @@ export async function buscarFuncionarioPorId(id: number): Promise<Funcionario> {
   return response.data;
 }
 
+function montarPayloadFuncionario(
+  funcionario: Funcionario
+): FuncionarioPayload {
+  return {
+    nome: funcionario.nome.trim(),
+    cargo: funcionario.cargo.trim(),
+    horasTrabalhadas: Number(funcionario.horasTrabalhadas),
+    salarioBase: Number(funcionario.salarioBase),
+    categoria: {
+      id: Number(funcionario.categoria?.id),
+      departamento: funcionario.categoria?.departamento ?? "",
+    },
+  };
+}
+
 export async function cadastrarFuncionario(
   funcionario: Funcionario
 ): Promise<Funcionario> {
-  const response = await api.post<Funcionario>("/funcionarios", funcionario);
+  const payload = montarPayloadFuncionario(funcionario);
+  const response = await api.post<Funcionario>("/funcionarios", payload);
   return response.data;
 }
 
@@ -186,9 +203,10 @@ export async function atualizarFuncionario(
   id: number,
   funcionario: Funcionario
 ): Promise<Funcionario> {
+  const payload = montarPayloadFuncionario(funcionario);
   const response = await api.put<Funcionario>(
     `/funcionarios/${id}`,
-    funcionario
+    payload
   );
 
   return response.data;

@@ -1,4 +1,10 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 import { toast } from "react-toastify";
 
 import "../../Style/Css/Pages/Perfil.css";
@@ -10,6 +16,17 @@ import {
   getToken,
   getUsuarioLogado,
 } from "../../Service/Service";
+import {
+  obterAvatarLocal,
+  salvarAvatarLocal,
+} from "../../Utils/userAvatar";
+
+const TIPOS_IMAGEM_ACEITOS = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+];
+const TAMANHO_MAXIMO_AVATAR = 2 * 1024 * 1024;
 
 interface PerfilForm {
   nome: string;
@@ -29,8 +46,10 @@ function normalizarUsuarioLogado(usuarioLogado: UsuarioLogin): Usuario {
 }
 
 function Perfil() {
+  const inputAvatarRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [salvando, setSalvando] = useState(false);
+  const [avatarLocal, setAvatarLocal] = useState("");
 
   const [usuarioOriginal, setUsuarioOriginal] = useState<Usuario | null>(null);
 
@@ -52,6 +71,7 @@ function Perfil() {
     }
 
     const usuario = normalizarUsuarioLogado(usuarioLogado);
+    setAvatarLocal(obterAvatarLocal());
 
     setUsuarioOriginal(usuario);
 
@@ -65,6 +85,39 @@ function Perfil() {
 
     setLoading(false);
   }, []);
+
+  function selecionarAvatar(event: ChangeEvent<HTMLInputElement>) {
+    const arquivo = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!arquivo) return;
+
+    if (!TIPOS_IMAGEM_ACEITOS.includes(arquivo.type)) {
+      toast.error("Selecione uma imagem JPG, PNG ou WEBP.");
+      return;
+    }
+
+    if (arquivo.size > TAMANHO_MAXIMO_AVATAR) {
+      toast.error("A imagem deve ter no máximo 2 MB.");
+      return;
+    }
+
+    const leitor = new FileReader();
+
+    leitor.onload = () => {
+      if (typeof leitor.result !== "string") return;
+
+      setAvatarLocal(leitor.result);
+      salvarAvatarLocal(leitor.result);
+      toast.success("Foto atualizada neste dispositivo.");
+    };
+
+    leitor.onerror = () => {
+      toast.error("Não foi possível carregar a imagem.");
+    };
+
+    leitor.readAsDataURL(arquivo);
+  }
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
@@ -205,10 +258,16 @@ function Perfil() {
 
         <aside className="perfil__card perfil__summary">
 
-          <div className="perfil__avatar">
-            {form.foto ? (
+          <button
+            className="perfil__avatar-button"
+            type="button"
+            onClick={() => inputAvatarRef.current?.click()}
+            aria-label="Alterar foto do perfil"
+          >
+            <div className="perfil__avatar">
+            {avatarLocal || form.foto ? (
               <img
-                src={form.foto}
+                src={avatarLocal || form.foto}
                 alt={form.nome || "Usuário"}
               />
             ) : (
@@ -218,7 +277,19 @@ function Perfil() {
                   .toUpperCase()}
               </span>
             )}
-          </div>
+            </div>
+            <span className="perfil__avatar-action">Alterar foto</span>
+          </button>
+
+          <input
+            ref={inputAvatarRef}
+            className="perfil__avatar-input"
+            type="file"
+            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+            onChange={selecionarAvatar}
+          />
+
+          <p className="perfil__avatar-help">JPG, PNG ou WEBP, até 2 MB</p>
 
           <h2>{form.nome || "Usuário"}</h2>
 

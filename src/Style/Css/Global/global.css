@@ -1,4 +1,107 @@
 @import "tailwindcss";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+body {
+  min-width: 320px;
+  background: #f8fafc;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+  font: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+a,
+span {
+  overflow-wrap: break-word;
+}
+
+.private-layout {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100dvh;
+  overflow-x: clip;
+}
+
+.private-layout__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  margin-left: 260px;
+  width: calc(100% - 260px);
+}
+
+.private-layout__main {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  padding: clamp(1rem, 2.5vw, 2rem);
+}
+
+@media (max-width: 900px) {
+  .private-layout {
+    display: block;
+  }
+
+  .private-layout__body {
+    width: 100%;
+    margin-left: 0;
+    padding-bottom: 68px;
+  }
+
+  .private-layout__main {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .private-layout__main {
+    padding: 0.75rem;
+  }
+}
+
 :root {
   /* ===================================================
      BRAND COLORS
