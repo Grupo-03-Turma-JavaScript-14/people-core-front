@@ -39,6 +39,17 @@ export interface Funcionario {
   categoria?: Departamento;
 }
 
+export interface FuncionarioPayload {
+  nome: string;
+  cargo: string;
+  horasTrabalhadas: number;
+  salarioBase: number;
+  categoria: {
+    id: number;
+    departamento: string;
+  };
+}
+
 export interface ApiErrorResponse {
   statusCode?: number;
   message?: string | string[];

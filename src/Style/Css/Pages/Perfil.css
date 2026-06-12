@@ -1,5 +1,7 @@
 .perfil {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 100%;
   color: #1f2937;
   animation: perfilFadeIn 420ms ease both;
@@ -23,6 +25,7 @@
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1.25rem;
+  min-width: 0;
 }
 
 .perfil__tag {
@@ -70,9 +73,12 @@
   grid-template-columns: 320px minmax(0, 1fr);
   gap: 1rem;
   align-items: start;
+  min-width: 0;
 }
 
 .perfil__card {
+  width: 100%;
+  min-width: 0;
   background: rgba(255, 255, 255, 0.94);
   border: 1px solid #d8eaeb;
   border-radius: 20px;
@@ -89,11 +95,50 @@
 .perfil__avatar {
   width: 112px;
   height: 112px;
-  margin: 0 auto 1rem;
+  margin: 0 auto;
   border-radius: 999px;
   background: linear-gradient(135deg, #00796f, #5ce1d2);
   padding: 4px;
   box-shadow: 0 12px 28px rgba(0, 121, 111, 0.18);
+}
+
+.perfil__avatar-button {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  margin: 0 auto 0.45rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.perfil__avatar-button:hover .perfil__avatar,
+.perfil__avatar-button:focus-visible .perfil__avatar {
+  transform: scale(1.03);
+  box-shadow: 0 16px 34px rgba(0, 121, 111, 0.25);
+}
+
+.perfil__avatar {
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.perfil__avatar-action {
+  color: #00796f;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.perfil__avatar-input {
+  display: none;
+}
+
+.perfil__avatar-help {
+  margin: 0 0 1rem !important;
+  color: #8da0b8 !important;
+  font-size: 0.72rem !important;
 }
 
 .perfil__avatar img,
@@ -312,6 +357,16 @@
 
   .perfil__grid {
     grid-template-columns: 1fr;
+  }
+
+  .perfil__form,
+  .perfil__summary {
+    padding: 1rem;
+  }
+
+  .perfil__avatar {
+    width: 96px;
+    height: 96px;
   }
 
   .perfil__actions {

@@ -8,6 +8,20 @@ import {
 } from "../../Service/Service";
 import type { Funcionario, Departamento } from "../../Service/Types";
 
+function normalizarNumeroInteiro(valor: string) {
+  if (valor === "") return "";
+
+  const numero = Number(valor);
+  return Number.isNaN(numero) ? "" : String(Math.max(0, Math.trunc(numero)));
+}
+
+function normalizarNumeroDecimal(valor: string) {
+  if (valor === "") return "";
+
+  const numero = Number(valor);
+  return Number.isNaN(numero) ? "" : String(Math.max(0, numero));
+}
+
 export default function Funcionarios() {
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
   const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
@@ -20,8 +34,8 @@ export default function Funcionarios() {
   const [nome, setNome] = useState("");
   const [cargo, setCargo] = useState("");
   const [categoriaId, setCategoriaId] = useState("");
-  const [horasTrabalhadas, setHorasTrabalhadas] = useState(0);
-  const [salarioBase, setSalarioBase] = useState(0);
+  const [horasTrabalhadas, setHorasTrabalhadas] = useState("");
+  const [salarioBase, setSalarioBase] = useState("");
 
   const [errors, setErrors] = useState({ nome: "", cargo: "", categoriaId: "", horasTrabalhadas: "", salarioBase: "" });
 
@@ -35,15 +49,15 @@ export default function Funcionarios() {
 
   const resetForm = () => {
     setNome(""); setCargo(""); setCategoriaId("");
-    setHorasTrabalhadas(0); setSalarioBase(0); setEditandoId(null);
+    setHorasTrabalhadas(""); setSalarioBase(""); setEditandoId(null);
     setErrors({ nome: "", cargo: "", categoriaId: "", horasTrabalhadas: "", salarioBase: "" });
   };
 
   const handleEdit = (f: Funcionario) => {
     setNome(f.nome); setCargo(f.cargo);
     setCategoriaId(String(f.categoria?.id || ""));
-    setHorasTrabalhadas(f.horasTrabalhadas);
-    setSalarioBase(f.salarioBase);
+    setHorasTrabalhadas(String(f.horasTrabalhadas));
+    setSalarioBase(String(f.salarioBase));
     setEditandoId(f.id || null);
     setModalOpen(true);
   };
@@ -62,8 +76,8 @@ export default function Funcionarios() {
     if (!nome.trim()) { e.nome = "Nome é obrigatório"; ok = false; }
     if (!cargo.trim()) { e.cargo = "Cargo é obrigatório"; ok = false; }
     if (!categoriaId) { e.categoriaId = "Selecione um departamento"; ok = false; }
-    if (horasTrabalhadas <= 0) { e.horasTrabalhadas = "Deve ser maior que zero"; ok = false; }
-    if (salarioBase <= 0) { e.salarioBase = "Deve ser maior que zero"; ok = false; }
+    if (!horasTrabalhadas || Number(horasTrabalhadas) <= 0) { e.horasTrabalhadas = "Deve ser maior que zero"; ok = false; }
+    if (!salarioBase || Number(salarioBase) <= 0) { e.salarioBase = "Deve ser maior que zero"; ok = false; }
     setErrors(e);
     return ok;
   };
@@ -71,7 +85,16 @@ export default function Funcionarios() {
   const handleSave = async () => {
     if (!validateForm()) return;
     setIsSubmitting(true);
-    const dados = { nome, cargo, horasTrabalhadas, salarioBase, categoria: { id: Number(categoriaId), departamento: "" } };
+    const dados: Funcionario = {
+      nome,
+      cargo,
+      horasTrabalhadas: Number(horasTrabalhadas),
+      salarioBase: Number(salarioBase),
+      categoria: {
+        id: Number(categoriaId),
+        departamento: "",
+      },
+    };
     try {
       if (editandoId !== null) await atualizarFuncionario(editandoId, dados);
       else await cadastrarFuncionario(dados);
@@ -96,17 +119,17 @@ export default function Funcionarios() {
     }`;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="w-full min-w-0 max-w-7xl mx-auto">
 
       {/* HEADER */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold text-slate-800">Funcionários</h1>
           <p className="text-slate-400 text-sm mt-0.5">{funcionarios.length} colaboradores cadastrados</p>
         </div>
         <button
           onClick={() => { resetForm(); setModalOpen(true); }}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-bold shadow-md transition-all active:scale-95"
+          className="flex w-full sm:w-auto items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-bold shadow-md transition-all active:scale-95"
           style={{ background: 'linear-gradient(135deg, #14B8A6, #0F766E)' }}
         >
           <span className="text-lg leading-none">+</span> Novo Funcionário
@@ -126,13 +149,13 @@ export default function Funcionarios() {
       </div>
 
       {/* TABELA */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="w-full min-w-0 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-x-auto overscroll-x-contain">
         {loading ? (
           <div className="flex items-center justify-center py-20 text-slate-400 text-sm gap-2">
             <span className="animate-spin text-[#14B8A6]">⟳</span> Carregando...
           </div>
         ) : (
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[900px] text-sm">
             <thead>
               <tr className="border-b border-slate-100" style={{ background: 'linear-gradient(135deg, #f0fdfa, #f8fafc)' }}>
                 {["Nome", "Cargo", "Departamento", "Horas Trab.", "Salário Base", "Salário Total", "Ações"].map(h => (
@@ -207,12 +230,12 @@ export default function Funcionarios() {
 
       {/* MODAL */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => setModalOpen(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4" onClick={() => setModalOpen(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto p-4 sm:p-6" onClick={e => e.stopPropagation()}>
 
             {/* Header modal */}
-            <div className="flex items-center justify-between mb-6">
-              <div>
+            <div className="flex items-start justify-between gap-3 mb-6">
+              <div className="min-w-0">
                 <h2 className="text-lg font-bold text-slate-800">{editandoId ? "Editar Funcionário" : "Novo Funcionário"}</h2>
                 <p className="text-slate-400 text-xs mt-0.5">Preencha os dados abaixo</p>
               </div>
@@ -245,29 +268,44 @@ export default function Funcionarios() {
               </div>
 
               {/* Horas + Salário lado a lado */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1">Horas Trab. *</label>
-                  <input type="number" value={horasTrabalhadas} onChange={e => setHorasTrabalhadas(Number(e.target.value))} min={0} className={inputCls(errors.horasTrabalhadas)} />
+                  <input
+                    type="number"
+                    value={horasTrabalhadas}
+                    onChange={e => setHorasTrabalhadas(normalizarNumeroInteiro(e.target.value))}
+                    placeholder="160"
+                    min={0}
+                    className={inputCls(errors.horasTrabalhadas)}
+                  />
                   {errors.horasTrabalhadas && <p className="text-xs text-red-500 mt-1">{errors.horasTrabalhadas}</p>}
                 </div>
                 <div>
                   <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1">Salário Base *</label>
-                  <input type="number" value={salarioBase} onChange={e => setSalarioBase(Number(e.target.value))} min={0} className={inputCls(errors.salarioBase)} />
+                  <input
+                    type="number"
+                    value={salarioBase}
+                    onChange={e => setSalarioBase(normalizarNumeroDecimal(e.target.value))}
+                    placeholder="3500"
+                    min={0}
+                    step="0.01"
+                    className={inputCls(errors.salarioBase)}
+                  />
                   {errors.salarioBase && <p className="text-xs text-red-500 mt-1">{errors.salarioBase}</p>}
                 </div>
               </div>
             </div>
 
             {/* Botões modal */}
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
-              <button onClick={() => setModalOpen(false)} className="text-sm text-slate-400 hover:text-slate-600 transition-colors bg-transparent border-none cursor-pointer">
+            <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 mt-6 pt-4 border-t border-slate-100">
+              <button onClick={() => setModalOpen(false)} className="w-full sm:w-auto py-2 text-sm text-slate-400 hover:text-slate-600 transition-colors bg-transparent border-none cursor-pointer">
                 Cancelar
               </button>
               <button
                 onClick={handleSave}
                 disabled={isSubmitting}
-                className="px-7 py-2.5 text-white text-sm font-bold rounded-xl shadow transition-all active:scale-95 disabled:opacity-60"
+                className="w-full sm:w-auto px-7 py-2.5 text-white text-sm font-bold rounded-xl shadow transition-all active:scale-95 disabled:opacity-60"
                 style={{ background: 'linear-gradient(135deg, #14B8A6, #0F766E)' }}
               >
                 {isSubmitting ? "Salvando..." : editandoId ? "Salvar Edição" : "Criar"}

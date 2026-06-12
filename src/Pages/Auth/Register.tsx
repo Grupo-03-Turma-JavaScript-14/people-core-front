@@ -81,7 +81,7 @@ function Register() {
       >
 
         <div
-          className="w-full md:w-1/2 flex flex-col items-center justify-center p-12"
+          className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 sm:p-10 md:p-12"
           style={{ background: 'linear-gradient(135deg, #14B8A6 0%, #5EEAD4 100%)' }}
         >
           <div className="w-full max-w-[280px]">
@@ -94,7 +94,7 @@ function Register() {
         </div>
 
         {/* Lado Direito: Formulário */}
-        <div className="w-full md:w-1/2 p-10 bg-white flex flex-col justify-center">
+        <div className="w-full min-w-0 md:w-1/2 p-6 sm:p-8 md:p-10 bg-white flex flex-col justify-center">
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-slate-800">Criar conta</h2>
             <p className="text-slate-400 text-sm mt-1">Preencha os campos abaixo para se cadastrar</p>
@@ -125,9 +125,9 @@ function Register() {
               </div>
             ))}
 
-            <div className="flex items-center justify-between pt-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4">
             
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-center sm:text-left text-slate-400">
                 Já tem conta?{' '}
                 <Link to="/login" className="font-bold transition-colors" style={{ color: '#14B8A6' }}>
                   Entrar
@@ -136,7 +136,7 @@ function Register() {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-8 py-2.5 text-white text-sm font-bold rounded-lg shadow-md transition-all active:scale-95 disabled:opacity-70"
+                className="w-full sm:w-auto px-8 py-2.5 text-white text-sm font-bold rounded-lg shadow-md transition-all active:scale-95 disabled:opacity-70"
                 style={{ background: '#14B8A6' }}
                 onMouseEnter={e => (e.currentTarget.style.background = '#0F766E')}
                 onMouseLeave={e => (e.currentTarget.style.background = '#14B8A6')}

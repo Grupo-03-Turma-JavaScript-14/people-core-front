@@ -10,11 +10,11 @@ export const Footer: React.FC = () => {
   }
 
   return (
-    <footer className="w-full bg-[#012b2c] border-t border-white/5 px-6 py-3 relative select-none">
+    <footer className="w-full min-w-0 bg-[#012b2c] border-t border-white/5 px-3 sm:px-6 py-3 relative select-none">
 
       <div className="max-w-6xl mx-auto flex flex-col items-center gap-2">
 
-        <div className="flex items-center gap-5 text-[#b7c7c8]">
+        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-5 text-[#b7c7c8]">
 
           <div className="flex items-center gap-3 text-sm">
 
@@ -47,9 +47,9 @@ export const Footer: React.FC = () => {
 
           </div>
 
-          <div className="w-px h-3 bg-white/10"></div>
+          <div className="hidden sm:block w-px h-3 bg-white/10"></div>
 
-          <div className="flex items-center gap-4 text-[11px] uppercase tracking-wide font-medium">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[11px] uppercase tracking-wide font-medium">
 
             <Link
               to="/sobre"

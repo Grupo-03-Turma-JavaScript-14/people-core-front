@@ -15,6 +15,20 @@ import {
 
 import type { Departamento, Funcionario } from "../../Service/Types";
 
+function normalizarNumeroInteiro(valor: string) {
+  if (valor === "") return "";
+
+  const numero = Number(valor);
+  return Number.isNaN(numero) ? "" : String(Math.max(0, Math.trunc(numero)));
+}
+
+function normalizarNumeroDecimal(valor: string) {
+  if (valor === "") return "";
+
+  const numero = Number(valor);
+  return Number.isNaN(numero) ? "" : String(Math.max(0, numero));
+}
+
 function Departamentos() {
   const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
   const [loading, setLoading] = useState(true);
@@ -97,7 +111,7 @@ function Departamentos() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="w-full min-w-0 max-w-7xl mx-auto">
 
       {/* HEADER — responsivo: empilha em mobile, lado a lado em sm+ */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
@@ -143,7 +157,7 @@ function Departamentos() {
               <p className="text-sm">Nenhum departamento cadastrado.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
               {departamentos.map((dept, index) => (
                 <DepartamentoCard
                   key={dept.id}
@@ -211,7 +225,7 @@ interface CardProps {
 
 function DepartamentoCard({ departamento, index, totalFuncionarios, isExpanded, onToggleExpand, onVerFuncionarios, onEditar, onDeletar }: CardProps) {
   return (
-    <div className={`bg-white rounded-2xl border transition-all duration-200 overflow-hidden shadow-sm ${
+    <div className={`w-full min-w-0 bg-white rounded-2xl border transition-all duration-200 overflow-hidden shadow-sm ${
       isExpanded ? "border-[#14B8A6] shadow-md" : "border-slate-100 hover:border-slate-200 hover:shadow-md"
     }`}>
 
@@ -219,16 +233,16 @@ function DepartamentoCard({ departamento, index, totalFuncionarios, isExpanded, 
       <div className="h-1.5 w-full" style={{ background: "linear-gradient(90deg, #14B8A6, #5EEAD4)" }} />
 
       {/* Header do card */}
-      <div className="p-5 cursor-pointer select-none" onClick={onToggleExpand}>
+      <div className="p-4 sm:p-5 cursor-pointer select-none" onClick={onToggleExpand}>
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white text-xs font-bold"
               style={{ background: "linear-gradient(135deg, #14B8A6, #0F766E)" }}>
-              #{String(index + 1).padStart(2, "0")}
+              #{index + 1}
             </div>
-            <div>
-              <h3 className="font-bold text-slate-800 text-base leading-tight">{departamento.departamento}</h3>
-              <div className="flex items-center gap-1 mt-0.5 text-slate-400 text-xs">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-bold text-slate-800 text-base leading-tight break-words [overflow-wrap:anywhere]">{departamento.departamento}</h3>
+              <div className="flex min-w-0 items-center gap-1 mt-0.5 text-slate-400 text-xs">
                 <Users size={11} />
                 <span>{totalFuncionarios} funcionário{totalFuncionarios !== 1 ? "s" : ""}</span>
               </div>
@@ -251,7 +265,7 @@ function DepartamentoCard({ departamento, index, totalFuncionarios, isExpanded, 
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-5 pb-5 border-t border-slate-50 pt-4 flex flex-col gap-3">
+            <div className="px-4 sm:px-5 pb-5 border-t border-slate-50 pt-4 flex flex-col gap-3">
               <button
                 onClick={onVerFuncionarios}
                 className="w-full py-2 rounded-lg text-sm font-semibold border transition-all"
@@ -296,10 +310,10 @@ function ModalFuncionarios({
   }>({ aberto: false, modo: "criar" });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-2 sm:p-4" onClick={onClose}>
       <motion.div
         /* max-h-[90vh] garante que o modal não vaze a tela em mobile */
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden max-h-[90vh] flex flex-col"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden max-h-[calc(100dvh-1rem)] flex flex-col"
         onClick={e => e.stopPropagation()}
         initial={{ opacity: 0, scale: 0.95, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -307,12 +321,12 @@ function ModalFuncionarios({
         transition={{ duration: 0.2 }}
       >
         {/* Header — fixo no topo do modal */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
-          <div>
+        <div className="flex items-start justify-between gap-3 px-4 sm:px-6 py-4 border-b border-slate-100 shrink-0">
+          <div className="min-w-0">
             <h2 className="font-bold text-slate-800 text-base">Funcionários</h2>
             <p className="text-slate-400 text-xs mt-0.5">{nome}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <button
               onClick={() => setModalFunc({ aberto: true, modo: "criar" })}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition-all"
@@ -339,18 +353,18 @@ function ModalFuncionarios({
           ) : (
             <div className="flex flex-col gap-2">
               {funcionarios.map(f => (
-                <div key={f.id} className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-[#14B8A6]/30 hover:bg-teal-50/30 transition-all">
-                  <div className="flex items-center gap-3">
+                <div key={f.id} className="flex min-w-0 items-center justify-between gap-2 p-3 rounded-xl border border-slate-100 hover:border-[#14B8A6]/30 hover:bg-teal-50/30 transition-all">
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
                     <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
                       style={{ background: "linear-gradient(135deg, #14B8A6, #0F766E)" }}>
                       {f.nome.charAt(0).toUpperCase()}
                     </div>
-                    <div>
-                      <p className="font-semibold text-slate-800 text-sm">{f.nome}</p>
-                      <p className="text-slate-400 text-xs">{f.cargo}</p>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-800 text-sm break-words [overflow-wrap:anywhere]">{f.nome}</p>
+                      <p className="text-slate-400 text-xs break-words [overflow-wrap:anywhere]">{f.cargo}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex shrink-0 items-center gap-1.5">
                     <button
                       onClick={() => setModalFunc({ aberto: true, modo: "editar", funcionario: f })}
                       className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:border-[#14B8A6] hover:text-[#14B8A6] transition-all bg-transparent cursor-pointer"
@@ -417,17 +431,17 @@ function ModalFormDepartamento({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4" onClick={onClose}>
       <motion.div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-4 sm:p-6 max-h-[calc(100dvh-1.5rem)] overflow-y-auto"
         onClick={e => e.stopPropagation()}
         initial={{ opacity: 0, scale: 0.95, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 16 }}
         transition={{ duration: 0.2 }}
       >
-        <div className="flex items-center justify-between mb-6">
-          <div>
+        <div className="flex items-start justify-between gap-3 mb-6">
+          <div className="min-w-0">
             <h2 className="text-lg font-bold text-slate-800">{modo === "criar" ? "Novo Departamento" : "Editar Departamento"}</h2>
             <p className="text-slate-400 text-xs mt-0.5">Informe o nome da unidade</p>
           </div>
@@ -449,14 +463,14 @@ function ModalFormDepartamento({
           />
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-          <button onClick={onClose} className="text-sm text-slate-400 hover:text-slate-600 transition-colors bg-transparent border-none cursor-pointer">
+        <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-slate-100">
+          <button onClick={onClose} className="w-full sm:w-auto py-2 text-sm text-slate-400 hover:text-slate-600 transition-colors bg-transparent border-none cursor-pointer">
             Cancelar
           </button>
           <button
             onClick={handleSubmit}
             disabled={salvando}
-            className="flex items-center gap-2 px-7 py-2.5 text-white text-sm font-bold rounded-xl shadow transition-all active:scale-95 disabled:opacity-60"
+            className="flex w-full sm:w-auto items-center justify-center gap-2 px-7 py-2.5 text-white text-sm font-bold rounded-xl shadow transition-all active:scale-95 disabled:opacity-60"
             style={{ background: "linear-gradient(135deg, #14B8A6, #0F766E)" }}
           >
             {salvando ? <><Loader2 size={14} className="animate-spin" /> Salvando...</> : modo === "criar" ? "Criar" : "Salvar"}
@@ -495,17 +509,17 @@ function ModalFormFuncionario({
   const inputCls = "w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition-all";
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4" onClick={onClose}>
       <motion.div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-4 sm:p-6 max-h-[calc(100dvh-1.5rem)] overflow-y-auto"
         onClick={e => e.stopPropagation()}
         initial={{ opacity: 0, scale: 0.95, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 16 }}
         transition={{ duration: 0.2 }}
       >
-        <div className="flex items-center justify-between mb-6">
-          <div>
+        <div className="flex items-start justify-between gap-3 mb-6">
+          <div className="min-w-0">
             <h2 className="text-lg font-bold text-slate-800">{modo === "criar" ? "Novo Funcionário" : "Editar Funcionário"}</h2>
             <p className="text-slate-400 text-xs mt-0.5">Preencha os dados abaixo</p>
           </div>
@@ -524,26 +538,41 @@ function ModalFormFuncionario({
               <input type={f.type} value={f.value} onChange={e => f.set(e.target.value)} placeholder={f.placeholder} className={inputCls} />
             </div>
           ))}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Horas Trab.</label>
-              <input type="number" value={horas} onChange={e => setHoras(e.target.value)} placeholder="160" min={0} className={inputCls} />
+              <input
+                type="number"
+                value={horas}
+                onChange={e => setHoras(normalizarNumeroInteiro(e.target.value))}
+                placeholder="160"
+                min={0}
+                className={inputCls}
+              />
             </div>
             <div>
               <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Salário Base</label>
-              <input type="number" value={salario} onChange={e => setSalario(e.target.value)} placeholder="3500" min={0} step="0.01" className={inputCls} />
+              <input
+                type="number"
+                value={salario}
+                onChange={e => setSalario(normalizarNumeroDecimal(e.target.value))}
+                placeholder="3500"
+                min={0}
+                step="0.01"
+                className={inputCls}
+              />
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
-          <button onClick={onClose} className="text-sm text-slate-400 hover:text-slate-600 transition-colors bg-transparent border-none cursor-pointer">
+        <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 mt-6 pt-4 border-t border-slate-100">
+          <button onClick={onClose} className="w-full sm:w-auto py-2 text-sm text-slate-400 hover:text-slate-600 transition-colors bg-transparent border-none cursor-pointer">
             Cancelar
           </button>
           <button
             onClick={handleSubmit}
             disabled={salvando}
-            className="flex items-center gap-2 px-7 py-2.5 text-white text-sm font-bold rounded-xl shadow transition-all active:scale-95 disabled:opacity-60"
+            className="flex w-full sm:w-auto items-center justify-center gap-2 px-7 py-2.5 text-white text-sm font-bold rounded-xl shadow transition-all active:scale-95 disabled:opacity-60"
             style={{ background: "linear-gradient(135deg, #14B8A6, #0F766E)" }}
           >
             {salvando ? <><Loader2 size={14} className="animate-spin" /> Salvando...</> : modo === "criar" ? "Criar" : "Salvar"}
