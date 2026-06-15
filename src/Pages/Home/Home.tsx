@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import {
   listarDepartamentos,
   listarFuncionarios,
-} from "../../service/Service";
-import type { Departamento, Funcionario } from "../../service/Types";
+} from "../../Service/Service";
+import type { Departamento, Funcionario } from "../../Service/Types";
 import "../../Style/Css/pages/Home.css";
 
 type TipoResultado = "Funcionário" | "Departamento" | "Cargo";

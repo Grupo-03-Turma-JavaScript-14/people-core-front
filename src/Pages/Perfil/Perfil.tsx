@@ -9,13 +9,13 @@ import { toast } from "react-toastify";
 
 import "../../Style/Css/pages/Perfil.css";
 
-import type { Usuario, UsuarioLogin } from "../../service/Types";
+import type { Usuario, UsuarioLogin } from "../../Service/Types";
 
 import {
   atualizarUsuario,
   getToken,
   getUsuarioLogado,
-} from "../../service/Service";
+} from "../../Service/Service";
 import {
   obterAvatarLocal,
   salvarAvatarLocal,

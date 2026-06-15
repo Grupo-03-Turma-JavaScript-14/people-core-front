@@ -10,7 +10,7 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 
-import { logout, getUsuarioLogado } from "../../service/Service";
+import { logout, getUsuarioLogado } from "../../Service/Service";
 import {
   obterAvatarLocal,
   USER_AVATAR_UPDATED_EVENT,

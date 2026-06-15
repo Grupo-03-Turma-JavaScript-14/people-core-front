@@ -1,6 +1,6 @@
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
-import LeftBar from "../components/Global/LeftBar";
-import { Footer } from "../components/Global/Footer";
+import LeftBar from "../Components/Global/LeftBar";
+import { Footer } from "../Components/Global/Footer";
 import Login from "./Auth/Login";
 import Register from "./Auth/Register";
 import Home from "./Home/Home";

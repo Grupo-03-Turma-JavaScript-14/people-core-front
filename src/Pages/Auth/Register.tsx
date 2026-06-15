@@ -1,8 +1,8 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { cadastrarUsuario } from '../../service/Service';
-import type { Usuario } from '../../service/Types';
+import { cadastrarUsuario } from '../../Service/Service';
+import type { Usuario } from '../../Service/Types';
 
 interface RegisterForm {
   nome: string;

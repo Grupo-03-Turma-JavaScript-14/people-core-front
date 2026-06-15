@@ -11,9 +11,9 @@ import {
   deletarFuncionario,
   cadastrarFuncionario,
   atualizarFuncionario,
-} from "../../service/Service";
+} from "../../Service/Service";
 
-import type { Departamento, Funcionario } from "../../service/Types";
+import type { Departamento, Funcionario } from "../../Service/Types";
 
 function normalizarNumeroInteiro(valor: string) {
   if (valor === "") return "";
