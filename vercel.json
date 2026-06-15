@@ -3,6 +3,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://peoplecore.gbworks.com.br/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
