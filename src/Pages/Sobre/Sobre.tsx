@@ -1,45 +1,50 @@
 import { motion, type Variants } from "framer-motion";
-
-import TeamPeopleCore from "../../Components/About/TeamPeopleCore";
-
 import "../../Style/Css/Pages/Sobre.css";
 import "../../Style/Css/Components/About/TeamPeopleCore.css";
+import TeamPeopleCore from "../../components/About/TeamPeopleCore";
 
 const equipe = [
   {
     nome: "Victor Ferreira",
     cargo: "Desenvolvedor",
     foto: "/AboutUs/victor-ferreira.png",
+    linkedIn: "https://linkedin.com/in/victor-ferreira0307",
   },
   {
     nome: "Bianca Nascimento",
     cargo: "Desenvolvedor",
     foto: "/AboutUs/bianca-nascimento.webp",
+    linkedIn: "https://linkedin.com/in/biancanascimento07",
   },
   {
     nome: "Jhonatan Alves",
     cargo: "Desenvolvedor",
     foto: "/AboutUs/jhonatan-alves.png",
+    linkedIn: "https://linkedin.com/in/devjhonatanmiranda",
   },
   {
     nome: "Kauã Moraes",
     cargo: "Desenvolvedor",
     foto: "/AboutUs/kaua-moraes.png",
+    linkedIn: "https://linkedin.com/in/kauaviniciussabino2707",
   },
   {
     nome: "Kefilwe Lourenço",
     cargo: "Desenvolvedor",
     foto: "/AboutUs/kefilwe-lourenco.png",
+    linkedIn: "https://linkedin.com/in/kefilwe-lourenco",
   },
   {
     nome: "Letícia Fonseca",
     cargo: "Desenvolvedor",
     foto: "/AboutUs/leticia-fonseca.png",
+    linkedIn: "https://linkedin.com/in/letíciafonseca"
   },
   {
     nome: "Taís Bernardini",
     cargo: "Desenvolvedor",
     foto: "/AboutUs/tais-bernardi.png",
+    linkedIn: "https://linkedin.com/in/duartetais",
   },
 ];
 
@@ -228,6 +233,7 @@ function Sobre() {
               titulo={membro.nome}
               subtitulo={membro.cargo}
               imagem={membro.foto}
+              linkedIn={membro.linkedIn}
             />
           ))}
         </motion.div>

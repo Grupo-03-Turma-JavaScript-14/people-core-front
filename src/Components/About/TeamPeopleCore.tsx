@@ -1,16 +1,18 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
+import { FaLinkedin } from "react-icons/fa";
 
 interface CharPeopleProps {
   titulo: string
   subtitulo: string
   imagem?: string
   popupImages?: string[]
+  linkedIn: string
 }
 
 const fallbackImage = '/people/generic.jpg'
 
-function CharPeople({ titulo, subtitulo, imagem, popupImages }: CharPeopleProps) {
+function CharPeople({ titulo, subtitulo, imagem, popupImages, linkedIn }: CharPeopleProps) {
   const [imageSrc, setImageSrc] = useState(imagem || fallbackImage)
   const [isImageHovered, setIsImageHovered] = useState(false)
   const [isCardHovered, setIsCardHovered] = useState(false)
@@ -112,6 +114,9 @@ function CharPeople({ titulo, subtitulo, imagem, popupImages }: CharPeopleProps)
       >
         <h3>{titulo}</h3>
         <p>{subtitulo}</p>
+        <a href={linkedIn} target="_blank" rel="noopener noreferrer" className='linkedin'>
+          <FaLinkedin size={32} />
+        </a>
       </motion.div>
     </motion.article>
   )
