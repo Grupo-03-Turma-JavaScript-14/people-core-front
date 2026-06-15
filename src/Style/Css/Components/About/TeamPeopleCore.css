@@ -241,7 +241,18 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1.2rem;
-  min-width: 0;
+  margin-inline-end: 0;
+}
+
+.linkedin {
+  display: inline-block;
+  margin-top: 0.8rem;
+  transition: border-color 200ms ease;
+}
+
+.linkedin svg {
+  width: 20px;
+  height: 20px;
 }
 
 @media (max-width: 1280px) {
@@ -299,3 +310,4 @@
     transition-duration: 1ms !important;
   }
 }
+
