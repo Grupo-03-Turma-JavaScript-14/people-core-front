@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { login } from '../../Service/Service';
+import { login } from '../../service/Service';
 
 interface LoginForm {
   usuario: string;

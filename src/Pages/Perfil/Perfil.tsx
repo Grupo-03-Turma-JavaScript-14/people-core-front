@@ -7,15 +7,15 @@ import {
 } from "react";
 import { toast } from "react-toastify";
 
-import "../../Style/Css/Pages/Perfil.css";
+import "../../Style/Css/pages/Perfil.css";
 
-import type { Usuario, UsuarioLogin } from "../../Service/Types";
+import type { Usuario, UsuarioLogin } from "../../service/Types";
 
 import {
   atualizarUsuario,
   getToken,
   getUsuarioLogado,
-} from "../../Service/Service";
+} from "../../service/Service";
 import {
   obterAvatarLocal,
   salvarAvatarLocal,
