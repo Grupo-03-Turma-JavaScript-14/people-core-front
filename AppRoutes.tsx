@@ -1,10 +1,10 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
-import Login from "./src/Pages/Auth/Login";
-import Register from "./src/Pages/Auth/Register";
-import DepartamentosPage from "./src/Pages/Departamentos/Departamentos";
-import Funcionarios from "./src/Pages/Funcionarios/Funcionarios";
-import Perfil from "./src/Pages/Perfil/Perfil";
+import Login from "./src/pages/Auth/Login";
+import Register from "./src/pages/Auth/Register";
+import DepartamentosPage from "./src/pages/Departamentos/Departamentos";
+import Funcionarios from "./src/pages/Funcionarios/Funcionarios";
+import Perfil from "./src/pages/Perfil/Perfil";
 
 function AppRoutes() {
   return (

@@ -1,14 +1,15 @@
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
-
-import { LeftBar } from "../Components/Global/LeftBar";
+import LeftBar from "../Components/Global/LeftBar";
 import { Footer } from "../Components/Global/Footer";
-import Sobre from "./Sobre/Sobre";
 import Login from "./Auth/Login";
 import Register from "./Auth/Register";
 import Home from "./Home/Home";
-import Departamentos from "./Departamentos/Departamentos";
 import Funcionarios from "./Funcionarios/Funcionarios";
+import Departamentos from "./Departamentos/Departamentos";
 import Perfil from "./Perfil/Perfil";
+import Sobre from "./Sobre/Sobre";
+
+
 
 function isAuthenticated() {
   return Boolean(localStorage.getItem("token"));
