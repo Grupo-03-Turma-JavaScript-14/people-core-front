@@ -15,7 +15,7 @@ import {
   obterAvatarLocal,
   USER_AVATAR_UPDATED_EVENT,
 } from "../../Utils/userAvatar";
-import "../../Style/Css/components/Global/LeftBar.css";
+import "../../Style/Css/Components/Global/LeftBar.css";
 
 export const LeftBar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);

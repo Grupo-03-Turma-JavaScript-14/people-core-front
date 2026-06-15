@@ -1,5 +1,5 @@
 import { motion, type Variants } from "framer-motion";
-import "../../Style/Css/pages/Sobre.css";
+import "../../Style/Css/Pages/Sobre.css";
 import "../../Style/Css/components/About/TeamPeopleCore.css";
 import TeamPeopleCore from "../../Components/About/TeamPeopleCore";
 

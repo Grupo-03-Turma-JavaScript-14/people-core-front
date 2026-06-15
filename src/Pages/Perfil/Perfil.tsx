@@ -7,7 +7,7 @@ import {
 } from "react";
 import { toast } from "react-toastify";
 
-import "../../Style/Css/pages/Perfil.css";
+import "../../Style/Css/Pages/Perfil.css";
 
 import type { Usuario, UsuarioLogin } from "../../Service/Types";
 

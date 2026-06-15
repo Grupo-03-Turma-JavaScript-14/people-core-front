@@ -6,7 +6,7 @@ import {
   listarFuncionarios,
 } from "../../Service/Service";
 import type { Departamento, Funcionario } from "../../Service/Types";
-import "../../Style/Css/pages/Home.css";
+import "../../Style/Css/Pages/Home.css";
 
 type TipoResultado = "Funcionário" | "Departamento" | "Cargo";
 
